@@ -16,144 +16,115 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
+  padding: 32px 16px 60px;
 }
-h1 { font-size: 1.6rem; margin-bottom: 6px; }
-.sub { color: #888; font-size: 0.9rem; margin-bottom: 30px; text-align: center; }
+h1 { font-size: 1.5rem; margin-bottom: 4px; }
+.sub { color: #666; font-size: 0.85rem; margin-bottom: 24px; text-align: center; }
+
 .drop-zone {
-  width: 100%;
-  max-width: 520px;
-  border: 2px dashed #444;
+  width: 100%; max-width: 560px;
+  border: 2px dashed #333;
   border-radius: 16px;
-  padding: 48px 20px;
+  padding: 40px 20px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  background: #1a1a1a;
+  background: #161616;
 }
-.drop-zone.drag { border-color: #4f8ef7; background: #1a2a3a; }
-.drop-zone:hover { border-color: #555; }
-.drop-icon { font-size: 3rem; margin-bottom: 12px; }
-.drop-text { color: #aaa; font-size: 0.95rem; }
-.drop-text strong { color: #e0e0e0; }
+.drop-zone.drag { border-color: #4f8ef7; background: #0d1a2b; }
+.drop-zone:hover { border-color: #444; }
+.drop-icon { font-size: 2.4rem; margin-bottom: 10px; }
+.drop-text { color: #999; font-size: 0.9rem; }
+.drop-text strong { color: #ddd; }
 input[type=file] { display: none; }
 
+/* Settings */
 .settings {
-  width: 100%;
-  max-width: 520px;
-  background: #1a1a1a;
+  width: 100%; max-width: 560px;
+  background: #161616;
   border-radius: 12px;
-  padding: 16px 20px;
-  margin-top: 16px;
-  display: none;
+  padding: 14px 18px;
+  margin-top: 12px;
 }
-.settings h3 { font-size: 0.9rem; color: #888; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-.setting-row {
+.settings-title { font-size: 0.78rem; color: #555; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.setting-row:last-child { margin-bottom: 0; }
+.setting-row label { font-size: 0.88rem; color: #bbb; }
+select {
+  background: #222; border: 1px solid #333; color: #e0e0e0;
+  border-radius: 6px; padding: 4px 8px; font-size: 0.82rem;
+}
+.crf-wrap { display: flex; align-items: center; gap: 8px; }
+input[type=range] { width: 110px; accent-color: #4f8ef7; }
+.crf-val { font-size: 0.82rem; color: #888; width: 62px; }
+
+/* File list */
+.file-list {
+  width: 100%; max-width: 560px;
+  margin-top: 12px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 8px;
 }
-.setting-row label { font-size: 0.9rem; color: #ccc; }
-select, input[type=range] {
-  background: #2a2a2a;
-  border: 1px solid #333;
-  color: #e0e0e0;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.85rem;
-}
-input[type=range] { width: 120px; }
-
-.card {
-  width: 100%;
-  max-width: 520px;
-  background: #1a1a1a;
-  border-radius: 16px;
-  padding: 20px;
-  margin-top: 16px;
-  display: none;
-}
-.file-info { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 0.88rem; color: #aaa; flex-wrap: wrap; gap: 4px; }
-.file-info span strong { color: #e0e0e0; }
-
-.progress-bar-wrap {
-  background: #2a2a2a;
-  border-radius: 8px;
-  height: 8px;
-  margin-bottom: 10px;
-  overflow: hidden;
-}
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #4f8ef7, #7bb8ff);
-  border-radius: 8px;
-  width: 0%;
-  transition: width 0.3s;
-}
-.progress-text { font-size: 0.85rem; color: #888; text-align: center; min-height: 1.2em; }
-
-.log-box {
-  background: #111;
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-family: monospace;
-  font-size: 0.78rem;
-  color: #5a5;
-  max-height: 120px;
-  overflow-y: auto;
-  margin-top: 12px;
-  display: none;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-.btn {
-  width: 100%;
-  max-width: 520px;
-  padding: 14px;
+.file-item {
+  background: #161616;
   border-radius: 12px;
-  border: none;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 12px;
-  transition: opacity 0.2s, background 0.2s;
-  display: none;
+  padding: 12px 14px;
 }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-convert { background: #4f8ef7; color: #fff; }
-.btn-convert:hover:not(:disabled) { background: #3a7de8; }
-.btn-download { background: #2ea043; color: #fff; }
-.btn-download:hover { background: #238636; }
-.btn-reset { background: #333; color: #ccc; }
-.btn-reset:hover { background: #444; }
+.file-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px; }
+.file-name { font-size: 0.88rem; color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.file-size { font-size: 0.8rem; color: #666; white-space: nowrap; }
+.badge {
+  font-size: 0.75rem; padding: 2px 8px; border-radius: 20px; white-space: nowrap;
+  font-weight: 600;
+}
+.badge-pending  { background: #2a2a2a; color: #888; }
+.badge-loading  { background: #1a2a3a; color: #4f8ef7; }
+.badge-convert  { background: #1a2a1a; color: #4caf50; }
+.badge-done     { background: #1a2f1a; color: #6ee17b; }
+.badge-error    { background: #2f1a1a; color: #f57c7c; }
 
-.size-compare { margin-top: 14px; display: none; font-size: 0.88rem; }
-.size-compare .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2a2a; }
-.size-compare .row:last-child { border-bottom: none; }
-.size-compare .label { color: #888; }
-.size-compare .value { color: #e0e0e0; }
-.size-compare .saved { color: #4caf50; font-weight: 600; }
+.file-bar-wrap { background: #222; border-radius: 4px; height: 4px; overflow: hidden; }
+.file-bar { height: 100%; background: linear-gradient(90deg, #4f8ef7, #7bb8ff); border-radius: 4px; width: 0%; transition: width 0.3s; }
+.file-note { font-size: 0.78rem; color: #666; margin-top: 5px; }
+.file-note.green { color: #5a9; }
+.file-note.red   { color: #c66; }
+
+/* Buttons */
+.actions { width: 100%; max-width: 560px; margin-top: 14px; display: flex; gap: 10px; }
+.btn {
+  flex: 1; padding: 13px; border-radius: 12px; border: none;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, background 0.2s;
+}
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-primary { background: #4f8ef7; color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #3a7de8; }
+.btn-secondary { background: #252525; color: #bbb; }
+.btn-secondary:hover:not(:disabled) { background: #2f2f2f; }
+
+.hint {
+  width: 100%; max-width: 560px;
+  margin-top: 16px;
+  font-size: 0.78rem; color: #444; text-align: center; line-height: 1.6;
+}
 </style>
 </head>
 <body>
 
 <h1>🎬 影片轉 LINE MP4</h1>
-<p class="sub">在瀏覽器本地轉換，不上傳任何資料</p>
+<p class="sub">在瀏覽器本地轉換 · 不上傳 · 支援批次</p>
 
 <div class="drop-zone" id="dropZone">
   <div class="drop-icon">📁</div>
-  <div class="drop-text"><strong>點擊選擇</strong>或拖曳影片到此處</div>
-  <div class="drop-text" style="margin-top:6px;font-size:0.8rem;">支援 MP4、MOV、AVI、MKV、WebM 等格式</div>
-  <input type="file" id="fileInput" accept="video/*">
+  <div class="drop-text"><strong>點擊選擇</strong>或拖曳影片（可多選）</div>
+  <div class="drop-text" style="margin-top:5px;font-size:0.78rem;">MP4 · MOV · AVI · MKV · WebM 等</div>
+  <input type="file" id="fileInput" accept="video/*" multiple>
 </div>
 
-<div class="settings" id="settings">
-  <h3>轉換設定</h3>
+<div class="settings" id="settings" style="display:none">
+  <div class="settings-title">套用至全部檔案</div>
   <div class="setting-row">
-    <label>解析度上限</label>
+    <label>解析度</label>
     <select id="resolution">
       <option value="0">原始（不縮放）</option>
       <option value="1080">1080p</option>
@@ -164,9 +135,9 @@ input[type=range] { width: 120px; }
   </div>
   <div class="setting-row">
     <label>畫質（CRF）</label>
-    <div style="display:flex;align-items:center;gap:8px">
+    <div class="crf-wrap">
       <input type="range" id="crf" min="18" max="35" value="18">
-      <span id="crfLabel" style="color:#aaa;font-size:0.85rem;width:60px">18（最高）</span>
+      <span class="crf-val" id="crfLabel">18（最高）</span>
     </div>
   </div>
   <div class="setting-row">
@@ -180,26 +151,16 @@ input[type=range] { width: 120px; }
   </div>
 </div>
 
-<div class="card" id="card">
-  <div class="file-info">
-    <span>📄 <strong id="fileName">-</strong></span>
-    <span>原始大小：<strong id="fileSize">-</strong></span>
-  </div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-  <div class="progress-text" id="progressText">準備中...</div>
-  <div class="log-box" id="logBox"></div>
-  <div class="size-compare" id="sizeCompare">
-    <div class="row"><span class="label">原始大小</span><span class="value" id="origSize">-</span></div>
-    <div class="row"><span class="label">轉換後大小</span><span class="value" id="outSize">-</span></div>
-    <div class="row"><span class="label">節省空間</span><span class="saved" id="savedSize">-</span></div>
-  </div>
+<div class="file-list" id="fileList"></div>
+
+<div class="actions" id="actions" style="display:none">
+  <button class="btn btn-primary" id="btnStart">🔄 開始轉換</button>
+  <button class="btn btn-secondary" id="btnClear">清除全部</button>
 </div>
 
-<button class="btn btn-convert" id="btnConvert">🔄 開始轉換</button>
-<button class="btn btn-download" id="btnDownload">⬇️ 下載 MP4</button>
-<button class="btn btn-reset" id="btnReset">重新選擇</button>
+<div class="hint" id="hint" style="display:none">
+  轉換完成後自動下載 · 若瀏覽器詢問「允許多個下載」請點允許
+</div>
 
 <script>
 const { createFFmpeg, fetchFile } = FFmpeg;
@@ -207,14 +168,11 @@ const { createFFmpeg, fetchFile } = FFmpeg;
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const settingsEl = document.getElementById('settings');
-const card = document.getElementById('card');
-const progressBar = document.getElementById('progressBar');
-const progressText = document.getElementById('progressText');
-const logBox = document.getElementById('logBox');
-const btnConvert = document.getElementById('btnConvert');
-const btnDownload = document.getElementById('btnDownload');
-const btnReset = document.getElementById('btnReset');
-const sizeCompare = document.getElementById('sizeCompare');
+const fileListEl = document.getElementById('fileList');
+const actionsEl = document.getElementById('actions');
+const hintEl = document.getElementById('hint');
+const btnStart = document.getElementById('btnStart');
+const btnClear = document.getElementById('btnClear');
 const crfInput = document.getElementById('crf');
 const crfLabel = document.getElementById('crfLabel');
 
@@ -224,168 +182,182 @@ crfInput.addEventListener('input', () => {
   crfLabel.textContent = `${v}（${q}）`;
 });
 
-let selectedFile = null;
-let outputBlob = null;
+// queue: [{file, status:'pending'|'loading'|'converting'|'done'|'error', pct:0, note:'', outputBlob}]
+let queue = [];
+let processing = false;
 let ffmpegLoaded = false;
 
 const ffmpeg = createFFmpeg({
   corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
   log: true,
-  progress: ({ ratio }) => {
-    const pct = Math.min(Math.round(ratio * 100), 99);
-    progressBar.style.width = pct + '%';
-    progressText.textContent = `轉換中 ${pct}%`;
-  },
 });
 
-ffmpeg.setLogger(({ type, message }) => {
-  if (type === 'fferr' || type === 'ffout') {
-    logBox.style.display = 'block';
-    logBox.textContent += message + '\n';
-    logBox.scrollTop = logBox.scrollHeight;
-  }
-});
-
-function formatBytes(bytes) {
+function fmt(bytes) {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
-function handleFile(file) {
-  if (!file || !file.type.startsWith('video/')) {
-    alert('請選擇影片檔案');
-    return;
+function addFiles(files) {
+  let added = 0;
+  for (const f of files) {
+    if (f.type.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm|wmv|flv|m4v|ts|mts)$/i.test(f.name)) {
+      queue.push({ file: f, status: 'pending', pct: 0, note: '', outputBlob: null });
+      added++;
+    }
   }
-  selectedFile = file;
-  outputBlob = null;
-
-  document.getElementById('fileName').textContent = file.name;
-  document.getElementById('fileSize').textContent = formatBytes(file.size);
-
-  settingsEl.style.display = 'block';
-  card.style.display = 'block';
-  btnConvert.style.display = 'block';
-  btnConvert.disabled = false;
-  btnReset.style.display = 'block';
-  btnDownload.style.display = 'none';
-  sizeCompare.style.display = 'none';
-  logBox.style.display = 'none';
-  logBox.textContent = '';
-  progressBar.style.width = '0%';
-  progressText.textContent = '點擊「開始轉換」';
-  dropZone.style.display = 'none';
+  if (added) render();
 }
 
+function render() {
+  const hasFiles = queue.length > 0;
+  settingsEl.style.display = hasFiles ? 'block' : 'none';
+  actionsEl.style.display = hasFiles ? 'flex' : 'none';
+  hintEl.style.display = hasFiles ? 'block' : 'none';
+
+  const allDone = queue.length > 0 && queue.every(q => q.status === 'done' || q.status === 'error');
+  const anyConverting = queue.some(q => q.status === 'converting' || q.status === 'loading');
+
+  btnStart.disabled = anyConverting || allDone;
+  btnStart.textContent = anyConverting ? '⏳ 轉換中...' : '🔄 開始轉換';
+  btnClear.disabled = anyConverting;
+
+  fileListEl.innerHTML = queue.map((item, i) => {
+    const badgeClass = {
+      pending: 'badge-pending', loading: 'badge-loading',
+      converting: 'badge-convert', done: 'badge-done', error: 'badge-error'
+    }[item.status];
+    const badgeText = {
+      pending: '待處理', loading: 'FFmpeg 載入中',
+      converting: `轉換中 ${item.pct}%`, done: '✅ 完成', error: '❌ 失敗'
+    }[item.status];
+    const showBar = item.status === 'converting' || item.status === 'loading';
+    const noteClass = item.status === 'error' ? 'red' : 'green';
+    return `
+      <div class="file-item" data-idx="${i}">
+        <div class="file-header">
+          <span class="file-name" title="${item.file.name}">${item.file.name}</span>
+          <span class="file-size">${fmt(item.file.size)}</span>
+          <span class="badge ${badgeClass}">${badgeText}</span>
+        </div>
+        ${showBar ? `<div class="file-bar-wrap"><div class="file-bar" style="width:${item.status==='loading'?5:item.pct}%"></div></div>` : ''}
+        ${item.note ? `<div class="file-note ${noteClass}">${item.note}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function autoDownload(item) {
+  const baseName = item.file.name.replace(/\.[^.]+$/, '');
+  const url = URL.createObjectURL(item.outputBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = baseName + '_mobile.mp4';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+}
+
+async function processQueue() {
+  if (processing) return;
+  processing = true;
+  btnStart.disabled = true;
+
+  const res = parseInt(document.getElementById('resolution').value);
+  const crf = document.getElementById('crf').value;
+  const audioBitrate = document.getElementById('audio').value;
+
+  for (let i = 0; i < queue.length; i++) {
+    const item = queue[i];
+    if (item.status !== 'pending') continue;
+
+    try {
+      if (!ffmpegLoaded) {
+        item.status = 'loading';
+        item.pct = 0;
+        render();
+        ffmpeg.setProgress(({ ratio }) => {
+          item.pct = Math.min(Math.round(ratio * 100), 99);
+          render();
+        });
+        await ffmpeg.load();
+        ffmpegLoaded = true;
+      } else {
+        ffmpeg.setProgress(({ ratio }) => {
+          item.pct = Math.min(Math.round(ratio * 100), 99);
+          render();
+        });
+      }
+
+      item.status = 'converting';
+      item.pct = 0;
+      render();
+
+      const ext = item.file.name.split('.').pop().toLowerCase() || 'mp4';
+      const inputName = `input_${i}.${ext}`;
+      const outputName = `output_${i}.mp4`;
+
+      ffmpeg.FS('writeFile', inputName, await fetchFile(item.file));
+
+      const args = ['-i', inputName,
+        '-c:v', 'libx264', '-preset', 'fast', '-crf', crf,
+        '-profile:v', 'main', '-level', '4.0'];
+
+      if (res > 0) {
+        const sf = `scale='if(gt(iw,ih),min(${Math.round(res*16/9)},iw),-2)':'if(gt(iw,ih),-2,min(${res},ih))',scale=trunc(iw/2)*2:trunc(ih/2)*2`;
+        args.push('-vf', sf);
+      }
+
+      if (audioBitrate === 'copy') {
+        args.push('-c:a', 'copy');
+      } else {
+        args.push('-c:a', 'aac', '-b:a', audioBitrate);
+      }
+
+      args.push('-movflags', '+faststart', '-y', outputName);
+
+      await ffmpeg.run(...args);
+
+      const data = ffmpeg.FS('readFile', outputName);
+      item.outputBlob = new Blob([data.buffer], { type: 'video/mp4' });
+
+      const saved = item.file.size - item.outputBlob.size;
+      item.note = `${fmt(item.outputBlob.size)}${saved > 0 ? `，節省 ${fmt(saved)}（${(saved/item.file.size*100).toFixed(0)}%）` : ''}`;
+      item.status = 'done';
+      item.pct = 100;
+      render();
+
+      autoDownload(item);
+
+      try { ffmpeg.FS('unlink', inputName); ffmpeg.FS('unlink', outputName); } catch(_) {}
+
+    } catch (err) {
+      item.status = 'error';
+      item.note = err.message;
+      render();
+    }
+  }
+
+  processing = false;
+  render();
+}
+
+btnStart.addEventListener('click', processQueue);
+
+btnClear.addEventListener('click', () => {
+  if (processing) return;
+  queue = [];
+  fileInput.value = '';
+  render();
+});
+
 dropZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+fileInput.addEventListener('change', e => { addFiles(Array.from(e.target.files)); fileInput.value = ''; });
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
 dropZone.addEventListener('drop', e => {
   e.preventDefault();
   dropZone.classList.remove('drag');
-  handleFile(e.dataTransfer.files[0]);
-});
-
-btnConvert.addEventListener('click', async () => {
-  if (!selectedFile) return;
-  btnConvert.disabled = true;
-  logBox.textContent = '';
-  logBox.style.display = 'none';
-  progressText.textContent = 'FFmpeg 載入中（首次約需 20 秒）...';
-  progressBar.style.width = '3%';
-
-  try {
-    if (!ffmpegLoaded) {
-      await ffmpeg.load();
-      ffmpegLoaded = true;
-    }
-
-    progressText.textContent = '讀取影片中...';
-    progressBar.style.width = '8%';
-
-    const ext = selectedFile.name.split('.').pop().toLowerCase();
-    const inputName = `input.${ext}`;
-    const outputName = 'output.mp4';
-
-    ffmpeg.FS('writeFile', inputName, await fetchFile(selectedFile));
-
-    const res = parseInt(document.getElementById('resolution').value);
-    const crf = document.getElementById('crf').value;
-    const audioBitrate = document.getElementById('audio').value;
-
-    progressText.textContent = '轉換中...';
-
-    const args = ['-i', inputName,
-      '-c:v', 'libx264', '-preset', 'fast', '-crf', crf,
-      '-profile:v', 'main', '-level', '4.0'];
-
-    if (res > 0) {
-      const scaleFilter = `scale='if(gt(iw,ih),min(${Math.round(res*16/9)},iw),-2)':'if(gt(iw,ih),-2,min(${res},ih))',scale=trunc(iw/2)*2:trunc(ih/2)*2`;
-      args.push('-vf', scaleFilter);
-    }
-
-    if (audioBitrate === 'copy') {
-      args.push('-c:a', 'copy');
-    } else {
-      args.push('-c:a', 'aac', '-b:a', audioBitrate);
-    }
-
-    args.push('-movflags', '+faststart', '-y', outputName);
-
-    await ffmpeg.run(...args);
-
-    const data = ffmpeg.FS('readFile', outputName);
-    outputBlob = new Blob([data.buffer], { type: 'video/mp4' });
-
-    progressBar.style.width = '100%';
-    progressText.textContent = '✅ 轉換完成！';
-
-    document.getElementById('origSize').textContent = formatBytes(selectedFile.size);
-    document.getElementById('outSize').textContent = formatBytes(outputBlob.size);
-    const saved = selectedFile.size - outputBlob.size;
-    document.getElementById('savedSize').textContent =
-      saved > 0
-        ? `節省 ${formatBytes(saved)}（${(saved / selectedFile.size * 100).toFixed(0)}%）`
-        : '檔案大小相近';
-    sizeCompare.style.display = 'block';
-
-    btnDownload.style.display = 'block';
-    btnConvert.style.display = 'none';
-
-    try {
-      ffmpeg.FS('unlink', inputName);
-      ffmpeg.FS('unlink', outputName);
-    } catch (_) {}
-
-  } catch (err) {
-    progressText.textContent = '❌ 轉換失敗：' + err.message;
-    logBox.style.display = 'block';
-    btnConvert.disabled = false;
-  }
-});
-
-btnDownload.addEventListener('click', () => {
-  if (!outputBlob) return;
-  const baseName = selectedFile.name.replace(/\.[^.]+$/, '');
-  const url = URL.createObjectURL(outputBlob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = baseName + '_mobile.mp4';
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-});
-
-btnReset.addEventListener('click', () => {
-  selectedFile = null;
-  outputBlob = null;
-  fileInput.value = '';
-  dropZone.style.display = 'block';
-  settingsEl.style.display = 'none';
-  card.style.display = 'none';
-  btnConvert.style.display = 'none';
-  btnDownload.style.display = 'none';
-  btnReset.style.display = 'none';
-  btnConvert.disabled = false;
+  addFiles(Array.from(e.dataTransfer.files));
 });
 </script>
 </body>
