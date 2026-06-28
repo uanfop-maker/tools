@@ -1,5 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-<head><meta charset="UTF-8"><title>Tools</title></head>
-<body><h1>工具列表</h1><p>由 Claude Code 自動建立與更新</p></body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工具列表</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e0e0e0; min-height: 100vh; padding: 40px 20px; }
+h1 { font-size: 1.6rem; margin-bottom: 4px; }
+.sub { color: #666; font-size: 0.88rem; margin-bottom: 32px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; max-width: 800px; }
+.card { background: #1a1a1a; border-radius: 14px; padding: 20px; text-decoration: none; color: inherit; transition: background 0.2s; display: block; }
+.card:hover { background: #222; }
+.icon { font-size: 2rem; margin-bottom: 10px; }
+.name { font-weight: 600; margin-bottom: 4px; }
+.desc { font-size: 0.85rem; color: #888; }
+</style>
+</head>
+<body>
+<h1>🛠 工具列表</h1>
+<p class="sub">由 Claude Code 自動建立與更新</p>
+<div class="grid">
+  <a class="card" href="video-to-mp4.html">
+    <div class="icon">🎬</div>
+    <div class="name">影片轉 LINE MP4</div>
+    <div class="desc">任意影片轉為手機相容 MP4，可直接在 LINE 播放。本地轉換，不上傳。</div>
+  </a>
+</div>
+</body>
 </html>

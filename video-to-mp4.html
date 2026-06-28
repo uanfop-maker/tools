@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>影片轉 LINE MP4</title>
+<script src="https://cdn.jsdelivr.net/npm/coi-serviceworker@0.1.7/coi-serviceworker.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0f0f0f;
+  color: #e0e0e0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+h1 { font-size: 1.6rem; margin-bottom: 6px; }
+.sub { color: #888; font-size: 0.9rem; margin-bottom: 30px; }
+.drop-zone {
+  width: 100%;
+  max-width: 520px;
+  border: 2px dashed #444;
+  border-radius: 16px;
+  padding: 48px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #1a1a1a;
+}
+.drop-zone.drag { border-color: #4f8ef7; background: #1a2a3a; }
+.drop-zone:hover { border-color: #555; }
+.drop-icon { font-size: 3rem; margin-bottom: 12px; }
+.drop-text { color: #aaa; font-size: 0.95rem; }
+.drop-text strong { color: #e0e0e0; }
+input[type=file] { display: none; }
+
+.settings {
+  width: 100%;
+  max-width: 520px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 16px;
+  display: none;
+}
+.settings h3 { font-size: 0.9rem; color: #888; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.setting-row label { font-size: 0.9rem; color: #ccc; }
+select, input[type=range] {
+  background: #2a2a2a;
+  border: 1px solid #333;
+  color: #e0e0e0;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+}
+input[type=range] { width: 120px; }
+
+.card {
+  width: 100%;
+  max-width: 520px;
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 16px;
+  display: none;
+}
+.file-info { display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 0.88rem; color: #aaa; }
+.file-info span strong { color: #e0e0e0; }
+
+.progress-bar-wrap {
+  background: #2a2a2a;
+  border-radius: 8px;
+  height: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4f8ef7, #7bb8ff);
+  border-radius: 8px;
+  width: 0%;
+  transition: width 0.3s;
+}
+.progress-text { font-size: 0.85rem; color: #888; text-align: center; min-height: 1.2em; }
+
+.log-box {
+  background: #111;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #5a5;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 12px;
+  display: none;
+}
+
+.btn {
+  width: 100%;
+  max-width: 520px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: opacity 0.2s;
+  display: none;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-convert { background: #4f8ef7; color: #fff; }
+.btn-convert:hover:not(:disabled) { background: #3a7de8; }
+.btn-download { background: #2ea043; color: #fff; }
+.btn-download:hover:not(:disabled) { background: #238636; }
+.btn-reset { background: #333; color: #ccc; }
+.btn-reset:hover { background: #444; }
+
+.size-compare { margin-top: 14px; display: none; font-size: 0.88rem; }
+.size-compare .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2a2a2a; }
+.size-compare .row:last-child { border-bottom: none; }
+.size-compare .label { color: #888; }
+.size-compare .value { color: #e0e0e0; }
+.size-compare .saved { color: #4caf50; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>🎬 影片轉 LINE MP4</h1>
+<p class="sub">在瀏覽器本地轉換，不上傳任何資料</p>
+
+<div class="drop-zone" id="dropZone">
+  <div class="drop-icon">📁</div>
+  <div class="drop-text"><strong>點擊選擇</strong>或拖曳影片到此處</div>
+  <div class="drop-text" style="margin-top:6px;font-size:0.8rem;">支援 MP4、MOV、AVI、MKV、WebM 等格式</div>
+  <input type="file" id="fileInput" accept="video/*">
+</div>
+
+<div class="settings" id="settings">
+  <h3>轉換設定</h3>
+  <div class="setting-row">
+    <label>解析度上限</label>
+    <select id="resolution">
+      <option value="720">720p（推薦）</option>
+      <option value="1080">1080p</option>
+      <option value="480">480p（小檔）</option>
+      <option value="360">360p（最小）</option>
+    </select>
+  </div>
+  <div class="setting-row">
+    <label>畫質（CRF）</label>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input type="range" id="crf" min="18" max="35" value="26">
+      <span id="crfLabel" style="color:#aaa;font-size:0.85rem;width:60px">26（佳）</span>
+    </div>
+  </div>
+  <div class="setting-row">
+    <label>音訊</label>
+    <select id="audio">
+      <option value="128k">128k（標準）</option>
+      <option value="96k">96k（省空間）</option>
+      <option value="192k">192k（高品質）</option>
+    </select>
+  </div>
+</div>
+
+<div class="card" id="card">
+  <div class="file-info">
+    <span>📄 <strong id="fileName">-</strong></span>
+    <span>原始大小：<strong id="fileSize">-</strong></span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="progress-text" id="progressText">準備中...</div>
+  <div class="log-box" id="logBox"></div>
+  <div class="size-compare" id="sizeCompare">
+    <div class="row"><span class="label">原始大小</span><span class="value" id="origSize">-</span></div>
+    <div class="row"><span class="label">轉換後大小</span><span class="value" id="outSize">-</span></div>
+    <div class="row"><span class="label">節省空間</span><span class="saved" id="savedSize">-</span></div>
+  </div>
+</div>
+
+<button class="btn btn-convert" id="btnConvert">🔄 開始轉換</button>
+<button class="btn btn-download" id="btnDownload">⬇️ 下載 MP4</button>
+<button class="btn btn-reset" id="btnReset">重新選擇</button>
+
+<script type="module">
+import { FFmpeg } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js';
+import { fetchFile, toBlobURL } from 'https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js';
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const settingsEl = document.getElementById('settings');
+const card = document.getElementById('card');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const logBox = document.getElementById('logBox');
+const btnConvert = document.getElementById('btnConvert');
+const btnDownload = document.getElementById('btnDownload');
+const btnReset = document.getElementById('btnReset');
+const sizeCompare = document.getElementById('sizeCompare');
+
+const crfInput = document.getElementById('crf');
+const crfLabel = document.getElementById('crfLabel');
+
+crfInput.addEventListener('input', () => {
+  const v = parseInt(crfInput.value);
+  const q = v <= 20 ? '最高' : v <= 24 ? '高' : v <= 28 ? '佳' : v <= 32 ? '中' : '低';
+  crfLabel.textContent = `${v}（${q}）`;
+});
+
+let selectedFile = null;
+let outputBlob = null;
+let ffmpegLoaded = false;
+const ffmpeg = new FFmpeg();
+
+ffmpeg.on('log', ({ message }) => {
+  logBox.style.display = 'block';
+  logBox.textContent += message + '\n';
+  logBox.scrollTop = logBox.scrollHeight;
+});
+
+ffmpeg.on('progress', ({ progress, time }) => {
+  const pct = Math.min(Math.round(progress * 100), 99);
+  progressBar.style.width = pct + '%';
+  const secs = time ? ` (${(time / 1000000).toFixed(1)}s)` : '';
+  progressText.textContent = `轉換中 ${pct}%${secs}`;
+});
+
+function formatBytes(bytes) {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('video/')) {
+    alert('請選擇影片檔案');
+    return;
+  }
+  selectedFile = file;
+  outputBlob = null;
+
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = formatBytes(file.size);
+
+  settingsEl.style.display = 'block';
+  card.style.display = 'block';
+  btnConvert.style.display = 'block';
+  btnReset.style.display = 'block';
+  btnDownload.style.display = 'none';
+  sizeCompare.style.display = 'none';
+  logBox.style.display = 'none';
+  logBox.textContent = '';
+  progressBar.style.width = '0%';
+  progressText.textContent = '點擊「開始轉換」';
+  dropZone.style.display = 'none';
+}
+
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag');
+  handleFile(e.dataTransfer.files[0]);
+});
+
+btnConvert.addEventListener('click', async () => {
+  if (!selectedFile) return;
+  btnConvert.disabled = true;
+  progressText.textContent = 'FFmpeg 載入中...';
+  progressBar.style.width = '5%';
+
+  try {
+    if (!ffmpegLoaded) {
+      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/esm';
+      await ffmpeg.load({
+        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+      });
+      ffmpegLoaded = true;
+    }
+
+    progressText.textContent = '讀取影片中...';
+    progressBar.style.width = '10%';
+
+    const inputName = 'input_' + selectedFile.name.replace(/[^a-zA-Z0-9.]/g, '_');
+    const outputName = 'output.mp4';
+
+    await ffmpeg.writeFile(inputName, await fetchFile(selectedFile));
+
+    const res = parseInt(document.getElementById('resolution').value);
+    const crf = document.getElementById('crf').value;
+    const audioBitrate = document.getElementById('audio').value;
+
+    const scaleFilter = `scale='if(gt(iw,ih),min(${res*16/9|0},iw),-2)':'if(gt(iw,ih),-2,min(${res},ih))',scale=trunc(iw/2)*2:trunc(ih/2)*2`;
+
+    progressText.textContent = '轉換中...';
+
+    await ffmpeg.exec([
+      '-i', inputName,
+      '-c:v', 'libx264',
+      '-preset', 'fast',
+      '-crf', crf,
+      '-profile:v', 'main',
+      '-level', '4.0',
+      '-vf', scaleFilter,
+      '-c:a', 'aac',
+      '-b:a', audioBitrate,
+      '-movflags', '+faststart',
+      '-y',
+      outputName
+    ]);
+
+    const data = await ffmpeg.readFile(outputName);
+    outputBlob = new Blob([data.buffer], { type: 'video/mp4' });
+
+    progressBar.style.width = '100%';
+    progressText.textContent = '✅ 轉換完成！';
+
+    document.getElementById('origSize').textContent = formatBytes(selectedFile.size);
+    document.getElementById('outSize').textContent = formatBytes(outputBlob.size);
+    const saved = selectedFile.size - outputBlob.size;
+    document.getElementById('savedSize').textContent =
+      saved > 0 ? `節省 ${formatBytes(saved)} (${(saved / selectedFile.size * 100).toFixed(0)}%)` : '檔案大小相近';
+    sizeCompare.style.display = 'block';
+
+    btnDownload.style.display = 'block';
+    btnConvert.style.display = 'none';
+
+    await ffmpeg.deleteFile(inputName);
+    await ffmpeg.deleteFile(outputName);
+
+  } catch (err) {
+    progressText.textContent = '❌ 轉換失敗：' + err.message;
+    logBox.style.display = 'block';
+    btnConvert.disabled = false;
+  }
+});
+
+btnDownload.addEventListener('click', () => {
+  if (!outputBlob) return;
+  const baseName = selectedFile.name.replace(/\.[^.]+$/, '');
+  const url = URL.createObjectURL(outputBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = baseName + '_mobile.mp4';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+});
+
+btnReset.addEventListener('click', () => {
+  selectedFile = null;
+  outputBlob = null;
+  fileInput.value = '';
+  dropZone.style.display = 'block';
+  settingsEl.style.display = 'none';
+  card.style.display = 'none';
+  btnConvert.style.display = 'none';
+  btnDownload.style.display = 'none';
+  btnReset.style.display = 'none';
+  btnConvert.disabled = false;
+});
+</script>
+</body>
+</html>
