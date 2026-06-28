@@ -155,8 +155,9 @@ input[type=range] { width: 120px; }
   <div class="setting-row">
     <label>解析度上限</label>
     <select id="resolution">
-      <option value="720">720p（推薦）</option>
+      <option value="0">原始（不縮放）</option>
       <option value="1080">1080p</option>
+      <option value="720">720p</option>
       <option value="480">480p（小檔）</option>
       <option value="360">360p（最小）</option>
     </select>
@@ -164,16 +165,17 @@ input[type=range] { width: 120px; }
   <div class="setting-row">
     <label>畫質（CRF）</label>
     <div style="display:flex;align-items:center;gap:8px">
-      <input type="range" id="crf" min="18" max="35" value="26">
-      <span id="crfLabel" style="color:#aaa;font-size:0.85rem;width:60px">26（佳）</span>
+      <input type="range" id="crf" min="18" max="35" value="18">
+      <span id="crfLabel" style="color:#aaa;font-size:0.85rem;width:60px">18（最高）</span>
     </div>
   </div>
   <div class="setting-row">
     <label>音訊</label>
     <select id="audio">
+      <option value="copy">原始（複製）</option>
+      <option value="192k">192k（高品質）</option>
       <option value="128k">128k（標準）</option>
       <option value="96k">96k（省空間）</option>
-      <option value="192k">192k（高品質）</option>
     </select>
   </div>
 </div>
@@ -311,24 +313,26 @@ btnConvert.addEventListener('click', async () => {
     const crf = document.getElementById('crf').value;
     const audioBitrate = document.getElementById('audio').value;
 
-    const scaleFilter = `scale='if(gt(iw,ih),min(${Math.round(res*16/9)},iw),-2)':'if(gt(iw,ih),-2,min(${res},ih))',scale=trunc(iw/2)*2:trunc(ih/2)*2`;
-
     progressText.textContent = '轉換中...';
 
-    await ffmpeg.run(
-      '-i', inputName,
-      '-c:v', 'libx264',
-      '-preset', 'fast',
-      '-crf', crf,
-      '-profile:v', 'main',
-      '-level', '4.0',
-      '-vf', scaleFilter,
-      '-c:a', 'aac',
-      '-b:a', audioBitrate,
-      '-movflags', '+faststart',
-      '-y',
-      outputName
-    );
+    const args = ['-i', inputName,
+      '-c:v', 'libx264', '-preset', 'fast', '-crf', crf,
+      '-profile:v', 'main', '-level', '4.0'];
+
+    if (res > 0) {
+      const scaleFilter = `scale='if(gt(iw,ih),min(${Math.round(res*16/9)},iw),-2)':'if(gt(iw,ih),-2,min(${res},ih))',scale=trunc(iw/2)*2:trunc(ih/2)*2`;
+      args.push('-vf', scaleFilter);
+    }
+
+    if (audioBitrate === 'copy') {
+      args.push('-c:a', 'copy');
+    } else {
+      args.push('-c:a', 'aac', '-b:a', audioBitrate);
+    }
+
+    args.push('-movflags', '+faststart', '-y', outputName);
+
+    await ffmpeg.run(...args);
 
     const data = ffmpeg.FS('readFile', outputName);
     outputBlob = new Blob([data.buffer], { type: 'video/mp4' });
