@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grok History Infinite Scroll - 安裝說明</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0d1a; color: #e0e0ff; font-family: -apple-system, 'Segoe UI', sans-serif; padding: 40px 20px; }
+  .container { max-width: 600px; margin: 0 auto; }
+  h1 { font-size: 24px; margin-bottom: 8px; color: #aaaaff; }
+  .subtitle { color: #6666aa; margin-bottom: 32px; }
+  .step { background: #1a1a2e; border: 1px solid #333366; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .step-num { display: inline-block; background: #4444aa; color: white; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-size: 13px; font-weight: bold; margin-right: 10px; }
+  .step-title { font-size: 15px; font-weight: 600; color: #ccccff; display: inline; }
+  .step-body { margin-top: 12px; color: #9090bb; line-height: 1.7; font-size: 14px; }
+  .step-body code { background: #0d0d2a; border: 1px solid #333366; border-radius: 4px; padding: 2px 6px; font-size: 12px; color: #aaaaff; }
+  .download-btn { display: block; background: #4444aa; color: white; text-decoration: none; text-align: center; padding: 14px; border-radius: 10px; font-size: 16px; font-weight: 600; margin: 24px 0; transition: background 0.2s; }
+  .download-btn:hover { background: #5555cc; }
+  .tip { background: #0a0a20; border-left: 3px solid #4444aa; padding: 12px 16px; border-radius: 0 6px 6px 0; margin-top: 12px; font-size: 13px; color: #7777aa; }
+  .usage { background: #111125; border: 1px solid #2a2a55; border-radius: 10px; padding: 20px; margin-top: 24px; }
+  .usage h2 { font-size: 16px; color: #aaaaff; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📜 Grok History Infinite Scroll</h1>
+  <p class="subtitle">讓 Grok 歷史列表可以無限往下滾，自動載入所有對話紀錄</p>
+
+  <a class="download-btn" href="https://raw.githubusercontent.com/uanfop-maker/tools/main/grok-history-scroll.zip" download>
+    ⬇️ 下載插件 ZIP
+  </a>
+
+  <div class="step">
+    <span class="step-num">1</span>
+    <span class="step-title">下載並解壓縮</span>
+    <div class="step-body">
+      點擊上方按鈕下載 ZIP，解壓縮到電腦任意位置（例如桌面的 <code>grok-history-scroll</code> 資料夾）
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">2</span>
+    <span class="step-title">開啟 Chrome 擴充功能頁面</span>
+    <div class="step-body">
+      在 Chrome 網址列輸入 <code>chrome://extensions</code> 並按 Enter
+      <div class="tip">右上角開啟「開發人員模式」(Developer mode)</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">3</span>
+    <span class="step-title">載入插件</span>
+    <div class="step-body">
+      點擊「載入未封裝項目」(Load unpacked)，選擇剛才解壓縮的 <code>grok-history-scroll</code> 資料夾
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="step-num">4</span>
+    <span class="step-title">開始使用</span>
+    <div class="step-body">
+      前往 <code>grok.com</code>，左下角會出現「📜 載入所有歷史」按鈕，點擊即可自動滾動載入全部歷史紀錄
+    </div>
+  </div>
+
+  <div class="usage">
+    <h2>使用說明</h2>
+    <ul style="padding-left:18px; color:#9090bb; line-height:2; font-size:14px;">
+      <li>點擊按鈕後自動滾動歷史側欄，持續載入更多對話</li>
+      <li>載入完成後按鈕顯示「✅ 完成」</li>
+      <li>每次開啟 Grok 都可以點擊一次以確保全部載入</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
