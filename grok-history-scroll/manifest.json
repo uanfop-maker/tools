@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Grok History Infinite Scroll",
+  "version": "1.0.0",
+  "description": "自動載入 Grok 所有對話歷史，讓歷史列表可以無限往下滾",
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": ["*://grok.com/*", "*://x.com/i/grok*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Grok History Loader"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
