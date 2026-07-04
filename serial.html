@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>流水編號產生器</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0d1626;
+    color: #e8dcc8;
+    min-height: 100vh;
+    padding: 20px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #c9a84c;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #c9a84c33;
+  }
+  .card {
+    background: #131f35;
+    border: 1px solid #c9a84c2a;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .label {
+    font-size: 0.68rem;
+    color: #c9a84c88;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  input[type="text"] {
+    background: #0d1626;
+    border: 1px solid #c9a84c44;
+    border-radius: 8px;
+    color: #e8dcc8;
+    font-size: 1.05rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    padding: 11px 15px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.06em;
+  }
+  input[type="text"]:focus { border-color: #c9a84c; }
+  input[type="text"]::placeholder { color: #c9a84c33; }
+
+  /* Main button */
+  .main-btn {
+    width: 100%;
+    background: linear-gradient(145deg, #b08020 0%, #d4af37 35%, #c9a84c 65%, #8b6914 100%);
+    border: none;
+    border-radius: 14px;
+    color: #0d1626;
+    cursor: pointer;
+    padding: 28px 20px 24px;
+    transition: opacity 0.15s, transform 0.1s;
+    position: relative;
+    box-shadow: 0 4px 24px #c9a84c22;
+    margin-bottom: 14px;
+  }
+  .main-btn:hover { opacity: 0.95; }
+  .main-btn:active { transform: scale(0.985); opacity: 0.88; }
+  .btn-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #0d162699;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .btn-number {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    color: #0d1626;
+    word-break: break-all;
+  }
+  .btn-sub {
+    font-size: 0.72rem;
+    margin-top: 8px;
+    color: #0d162677;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  /* History */
+  .hist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .hist-title {
+    font-size: 0.68rem;
+    color: #c9a84c88;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .row-btns { display: flex; gap: 6px; }
+  .ghost-btn {
+    background: none;
+    border: 1px solid #c9a84c44;
+    border-radius: 6px;
+    color: #c9a84c88;
+    cursor: pointer;
+    font-size: 0.72rem;
+    padding: 4px 11px;
+    transition: background 0.2s, color 0.2s;
+    letter-spacing: 0.04em;
+  }
+  .ghost-btn:hover { background: #c9a84c1a; color: #c9a84c; }
+  .ghost-btn.undo { color: #c9a84cbb; border-color: #c9a84c77; }
+
+  .divider { height: 1px; background: linear-gradient(90deg,transparent,#c9a84c22,transparent); margin-bottom: 14px; }
+
+  .hist-list { display: flex; flex-direction: column; gap: 8px; }
+  .hist-item {
+    background: #0d1626;
+    border: 1px solid #c9a84c18;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hist-info { flex: 1; min-width: 0; }
+  .hist-code {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.92rem;
+    color: #c9a84c;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hist-time {
+    font-size: 0.68rem;
+    color: #6677aa;
+    margin-top: 3px;
+  }
+  .x-btn {
+    background: none;
+    border: none;
+    color: #44446688;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .x-btn:hover { color: #c9a84c; background: #c9a84c18; }
+
+  .hist-empty {
+    text-align: center;
+    color: #44446688;
+    padding: 28px 0;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: linear-gradient(135deg, #b08020, #d4af37);
+    color: #0d1626;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    opacity: 0;
+    transition: transform 0.28s, opacity 0.28s;
+    pointer-events: none;
+    z-index: 999;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1>⚜ 流水編號產生器</h1>
+
+<div class="card">
+  <div class="label">當前編號（英數字，數字結尾）</div>
+  <input type="text" id="inp-number" placeholder="例：AA090801" spellcheck="false" autocomplete="off">
+</div>
+
+<div class="card">
+  <div class="label">模板字串（選填）— 用 {n} 代表編號位置</div>
+  <input type="text" id="inp-template" placeholder="例：訂單-{n}-確認　或留空" spellcheck="false" autocomplete="off">
+</div>
+
+<button class="main-btn" id="main-btn" onclick="handleClick()">
+  <div class="btn-label">點擊複製並遞增編號</div>
+  <div class="btn-number" id="btn-number">---</div>
+  <div class="btn-sub" id="btn-sub"></div>
+</button>
+
+<div class="card">
+  <div class="hist-header">
+    <div class="hist-title">點擊歷史</div>
+    <div class="row-btns">
+      <button class="ghost-btn undo" id="undo-btn" onclick="undoDelete()" style="display:none">↩ 恢復</button>
+      <button class="ghost-btn" onclick="exportCSV()">匯出 CSV</button>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="hist-list" id="hist-list"></div>
+  <div class="hist-empty" id="hist-empty">尚無紀錄</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let history = [];
+let lastDeleted = null;
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('serial_gen_v1');
+    if (!s) return;
+    const obj = JSON.parse(s);
+    if (obj.number)   document.getElementById('inp-number').value   = obj.number;
+    if (obj.template) document.getElementById('inp-template').value = obj.template;
+    if (obj.history)  history = obj.history;
+  } catch {}
+}
+
+function saveState() {
+  localStorage.setItem('serial_gen_v1', JSON.stringify({
+    number:   document.getElementById('inp-number').value,
+    template: document.getElementById('inp-template').value,
+    history
+  }));
+}
+
+function splitSerial(s) {
+  const m = s.match(/^(.*?)(\d+)$/);
+  if (!m) return null;
+  return { prefix: m[1], numStr: m[2], num: parseInt(m[2], 10), width: m[2].length };
+}
+
+function incrementSerial(s) {
+  const p = splitSerial(s);
+  if (!p) return s;
+  const next = p.num + 1;
+  return p.prefix + String(next).padStart(p.width, '0');
+}
+
+function getDisplay(num) {
+  const tpl = document.getElementById('inp-template').value.trim();
+  if (!tpl) return num;
+  return tpl.replace(/\{n\}/g, num);
+}
+
+function updateUI() {
+  const num = document.getElementById('inp-number').value.trim();
+  const tpl = document.getElementById('inp-template').value.trim();
+  const numEl = document.getElementById('btn-number');
+  const subEl = document.getElementById('btn-sub');
+  if (!num) { numEl.textContent = '---'; subEl.textContent = ''; return; }
+  if (tpl) {
+    numEl.textContent = tpl.replace(/\{n\}/g, num);
+    subEl.textContent = '編號：' + num;
+  } else {
+    numEl.textContent = num;
+    subEl.textContent = '';
+  }
+}
+
+function renderHistory() {
+  const list  = document.getElementById('hist-list');
+  const empty = document.getElementById('hist-empty');
+  empty.style.display = history.length ? 'none' : 'block';
+  list.innerHTML = '';
+  [...history].reverse().forEach((item, ri) => {
+    const idx = history.length - 1 - ri;
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    div.innerHTML = `
+      <div class="hist-info">
+        <div class="hist-code">${esc(item.display)}</div>
+        <div class="hist-time">${esc(item.time)}</div>
+      </div>
+      <button class="x-btn" data-idx="${idx}" title="刪除">✕</button>`;
+    div.querySelector('.x-btn').addEventListener('click', () => deleteItem(idx));
+    list.appendChild(div);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function handleClick() {
+  const num = document.getElementById('inp-number').value.trim();
+  if (!num) { showToast('請先輸入編號'); return; }
+  if (!splitSerial(num)) { showToast('編號必須以數字結尾'); return; }
+
+  const display = getDisplay(num);
+  navigator.clipboard.writeText(display)
+    .then(() => showToast('已複製：' + display))
+    .catch(() => showToast('複製失敗，請確認瀏覽器權限'));
+
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const timeStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  history.push({ display, number: num, time: timeStr });
+
+  document.getElementById('inp-number').value = incrementSerial(num);
+  updateUI();
+  renderHistory();
+  saveState();
+}
+
+function deleteItem(idx) {
+  lastDeleted = { item: history[idx], idx };
+  history.splice(idx, 1);
+  document.getElementById('undo-btn').style.display = '';
+  renderHistory();
+  saveState();
+}
+
+function undoDelete() {
+  if (!lastDeleted) return;
+  history.splice(lastDeleted.idx, 0, lastDeleted.item);
+  lastDeleted = null;
+  document.getElementById('undo-btn').style.display = 'none';
+  renderHistory();
+  saveState();
+}
+
+function exportCSV() {
+  if (!history.length) { showToast('沒有紀錄可匯出'); return; }
+  const rows = [['時間','複製內容','編號']];
+  history.forEach(h => rows.push([h.time, h.display, h.number]));
+  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['﻿'+csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'serial_history.csv';
+  a.click();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+document.getElementById('inp-number').addEventListener('input', () => { updateUI(); saveState(); });
+document.getElementById('inp-template').addEventListener('input', () => { updateUI(); saveState(); });
+document.getElementById('inp-number').addEventListener('keydown', e => { if (e.key === 'Enter') handleClick(); });
+
+loadState();
+updateUI();
+renderHistory();
+</script>
+</body>
+</html>
