@@ -5,299 +5,400 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>流水編號產生器</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #0d1626;
-    color: #e8dcc8;
-    min-height: 100vh;
-    padding: 20px;
-    max-width: 520px;
-    margin: 0 auto;
-  }
-  h1 {
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #c9a84c;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #c9a84c33;
-  }
-  .card {
-    background: #131f35;
-    border: 1px solid #c9a84c2a;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 14px;
-  }
-  .label {
-    font-size: 0.68rem;
-    color: #c9a84c88;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  input[type="text"] {
-    background: #0d1626;
-    border: 1px solid #c9a84c44;
-    border-radius: 8px;
-    color: #e8dcc8;
-    font-size: 1.05rem;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    padding: 11px 15px;
-    width: 100%;
-    outline: none;
-    transition: border-color 0.2s;
-    letter-spacing: 0.06em;
-  }
-  input[type="text"]:focus { border-color: #c9a84c; }
-  input[type="text"]::placeholder { color: #c9a84c33; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0b1220;
+  color: #e8dcc8;
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+}
+.page-title {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #c9a84c;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #c9a84c2a;
+}
+.groups {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media (max-width: 900px) { .groups { grid-template-columns: 1fr; } }
+@media (min-width: 901px) and (max-width: 1100px) { .groups { grid-template-columns: repeat(2, 1fr); } }
 
-  /* Main button */
-  .main-btn {
-    width: 100%;
-    background: linear-gradient(145deg, #b08020 0%, #d4af37 35%, #c9a84c 65%, #8b6914 100%);
-    border: none;
-    border-radius: 14px;
-    color: #0d1626;
-    cursor: pointer;
-    padding: 28px 20px 24px;
-    transition: opacity 0.15s, transform 0.1s;
-    position: relative;
-    box-shadow: 0 4px 24px #c9a84c22;
-    margin-bottom: 14px;
-  }
-  .main-btn:hover { opacity: 0.95; }
-  .main-btn:active { transform: scale(0.985); opacity: 0.88; }
-  .btn-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: #0d162699;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-  .btn-number {
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 2.4rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    line-height: 1;
-    color: #0d1626;
-    word-break: break-all;
-  }
-  .btn-sub {
-    font-size: 0.72rem;
-    margin-top: 8px;
-    color: #0d162677;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-  }
+/* Group card */
+.group {
+  background: #111c30;
+  border: 1px solid #c9a84c22;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.group-title {
+  font-size: 0.7rem;
+  color: #c9a84caa;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #c9a84c18;
+}
+.field-label {
+  font-size: 0.65rem;
+  color: #c9a84c77;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+input[type="text"], textarea {
+  background: #0b1220;
+  border: 1px solid #c9a84c33;
+  border-radius: 8px;
+  color: #e8dcc8;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  padding: 10px 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+input[type="text"]:focus, textarea:focus { border-color: #c9a84c; }
+input[type="text"]::placeholder, textarea::placeholder { color: #c9a84c2e; }
+textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+  font-size: 0.88rem;
+}
 
-  /* History */
-  .hist-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-  .hist-title {
-    font-size: 0.68rem;
-    color: #c9a84c88;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-  .row-btns { display: flex; gap: 6px; }
-  .ghost-btn {
-    background: none;
-    border: 1px solid #c9a84c44;
-    border-radius: 6px;
-    color: #c9a84c88;
-    cursor: pointer;
-    font-size: 0.72rem;
-    padding: 4px 11px;
-    transition: background 0.2s, color 0.2s;
-    letter-spacing: 0.04em;
-  }
-  .ghost-btn:hover { background: #c9a84c1a; color: #c9a84c; }
-  .ghost-btn.undo { color: #c9a84cbb; border-color: #c9a84c77; }
+/* Two-button row */
+.btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.copy-btn {
+  background: linear-gradient(150deg, #a87828 0%, #d4af37 40%, #c9a84c 65%, #8b6610 100%);
+  border: none;
+  border-radius: 11px;
+  color: #0b1220;
+  cursor: pointer;
+  padding: 16px 10px 14px;
+  transition: opacity 0.15s, transform 0.1s;
+  text-align: center;
+  box-shadow: 0 3px 16px #c9a84c18;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.copy-btn:hover { opacity: 0.93; }
+.copy-btn:active { transform: scale(0.97); opacity: 0.85; }
+.copy-btn .btn-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #0b122099;
+  font-weight: 700;
+}
+.copy-btn .btn-val {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  word-break: break-all;
+  color: #0b1220;
+}
+.copy-btn .btn-val.small { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.03em; opacity: 0.8; white-space: pre-wrap; text-align: left; }
+.copy-btn.dim { background: linear-gradient(150deg, #7a5a18 0%, #9a7a2a 50%, #7a5a18 100%); }
+.copy-btn.dim .btn-val { color: #0b122077; }
 
-  .divider { height: 1px; background: linear-gradient(90deg,transparent,#c9a84c22,transparent); margin-bottom: 14px; }
+/* History */
+.hist-wrap { flex: 1; }
+.hist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.hist-label { font-size: 0.65rem; color: #c9a84c77; letter-spacing: 0.12em; text-transform: uppercase; }
+.row-btns { display: flex; gap: 5px; }
+.ghost-btn {
+  background: none;
+  border: 1px solid #c9a84c33;
+  border-radius: 5px;
+  color: #c9a84c88;
+  cursor: pointer;
+  font-size: 0.65rem;
+  padding: 3px 9px;
+  letter-spacing: 0.04em;
+  transition: background 0.2s, color 0.2s;
+}
+.ghost-btn:hover { background: #c9a84c18; color: #c9a84c; }
+.ghost-btn.undo { border-color: #c9a84c55; color: #c9a84cbb; }
+.divider { height: 1px; background: linear-gradient(90deg, transparent, #c9a84c1a, transparent); margin-bottom: 10px; }
+.hist-list { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.hist-list::-webkit-scrollbar { width: 3px; }
+.hist-list::-webkit-scrollbar-track { background: transparent; }
+.hist-list::-webkit-scrollbar-thumb { background: #c9a84c33; border-radius: 2px; }
+.hist-item {
+  background: #0b1220;
+  border: 1px solid #c9a84c14;
+  border-radius: 7px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.hist-info { flex: 1; min-width: 0; }
+.hist-code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  color: #c9a84c;
+  font-weight: 600;
+  word-break: break-all;
+  white-space: pre-wrap;
+  line-height: 1.4;
+}
+.hist-time { font-size: 0.62rem; color: #556688; margin-top: 2px; }
+.x-btn {
+  background: none;
+  border: none;
+  color: #33446688;
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  transition: color 0.2s, background 0.2s;
+  line-height: 1;
+  margin-top: 1px;
+}
+.x-btn:hover { color: #c9a84c; background: #c9a84c18; }
+.hist-empty { text-align: center; color: #33446688; padding: 20px 0; font-size: 0.78rem; }
 
-  .hist-list { display: flex; flex-direction: column; gap: 8px; }
-  .hist-item {
-    background: #0d1626;
-    border: 1px solid #c9a84c18;
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .hist-info { flex: 1; min-width: 0; }
-  .hist-code {
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 0.92rem;
-    color: #c9a84c;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .hist-time {
-    font-size: 0.68rem;
-    color: #6677aa;
-    margin-top: 3px;
-  }
-  .x-btn {
-    background: none;
-    border: none;
-    color: #44446688;
-    cursor: pointer;
-    font-size: 0.9rem;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: color 0.2s, background 0.2s;
-    flex-shrink: 0;
-    line-height: 1;
-  }
-  .x-btn:hover { color: #c9a84c; background: #c9a84c18; }
-
-  .hist-empty {
-    text-align: center;
-    color: #44446688;
-    padding: 28px 0;
-    font-size: 0.82rem;
-    letter-spacing: 0.06em;
-  }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%) translateY(70px);
-    background: linear-gradient(135deg, #b08020, #d4af37);
-    color: #0d1626;
-    padding: 10px 24px;
-    border-radius: 24px;
-    font-size: 0.88rem;
-    font-weight: 700;
-    opacity: 0;
-    transition: transform 0.28s, opacity 0.28s;
-    pointer-events: none;
-    z-index: 999;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    max-width: 90vw;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(70px);
+  background: linear-gradient(135deg, #a87828, #d4af37);
+  color: #0b1220;
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: transform 0.28s, opacity 0.28s;
+  pointer-events: none;
+  z-index: 999;
+  letter-spacing: 0.04em;
+  max-width: 88vw;
+  text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 </style>
 </head>
 <body>
 
-<h1>⚜ 流水編號產生器</h1>
-
-<div class="card">
-  <div class="label">當前編號（英數字，數字結尾）</div>
-  <input type="text" id="inp-number" placeholder="例：AA090801" spellcheck="false" autocomplete="off">
-</div>
-
-<div class="card">
-  <div class="label">模板字串（選填）— 用 {n} 代表編號位置</div>
-  <input type="text" id="inp-template" placeholder="例：訂單-{n}-確認　或留空" spellcheck="false" autocomplete="off">
-</div>
-
-<button class="main-btn" id="main-btn" onclick="handleClick()">
-  <div class="btn-label">點擊複製並遞增編號</div>
-  <div class="btn-number" id="btn-number">---</div>
-  <div class="btn-sub" id="btn-sub"></div>
-</button>
-
-<div class="card">
-  <div class="hist-header">
-    <div class="hist-title">點擊歷史</div>
-    <div class="row-btns">
-      <button class="ghost-btn undo" id="undo-btn" onclick="undoDelete()" style="display:none">↩ 恢復</button>
-      <button class="ghost-btn" onclick="exportCSV()">匯出 CSV</button>
-    </div>
-  </div>
-  <div class="divider"></div>
-  <div class="hist-list" id="hist-list"></div>
-  <div class="hist-empty" id="hist-empty">尚無紀錄</div>
-</div>
-
+<div class="page-title">⚜ 流水編號產生器</div>
+<div class="groups" id="groups"></div>
 <div class="toast" id="toast"></div>
 
 <script>
-let history = [];
-let lastDeleted = null;
-
-function loadState() {
-  try {
-    const s = localStorage.getItem('serial_gen_v1');
-    if (!s) return;
-    const obj = JSON.parse(s);
-    if (obj.number)   document.getElementById('inp-number').value   = obj.number;
-    if (obj.template) document.getElementById('inp-template').value = obj.template;
-    if (obj.history)  history = obj.history;
-  } catch {}
-}
-
-function saveState() {
-  localStorage.setItem('serial_gen_v1', JSON.stringify({
-    number:   document.getElementById('inp-number').value,
-    template: document.getElementById('inp-template').value,
-    history
-  }));
-}
+const GROUP_COUNT = 3;
+const STORE_KEY = g => `serial_v2_g${g}`;
 
 function splitSerial(s) {
-  const m = s.match(/^(.*?)(\d+)$/);
+  const m = String(s).match(/^(.*?)(\d+)$/);
   if (!m) return null;
   return { prefix: m[1], numStr: m[2], num: parseInt(m[2], 10), width: m[2].length };
 }
-
 function incrementSerial(s) {
   const p = splitSerial(s);
   if (!p) return s;
-  const next = p.num + 1;
-  return p.prefix + String(next).padStart(p.width, '0');
+  return p.prefix + String(p.num + 1).padStart(p.width, '0');
 }
-
-function getDisplay(num) {
-  const tpl = document.getElementById('inp-template').value.trim();
-  if (!tpl) return num;
+function applyTemplate(num, tpl) {
+  if (!tpl.trim()) return '';
   return tpl.replace(/\{n\}/g, num);
 }
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function nowStr() {
+  const d = new Date();
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
 
-function updateUI() {
-  const num = document.getElementById('inp-number').value.trim();
-  const tpl = document.getElementById('inp-template').value.trim();
-  const numEl = document.getElementById('btn-number');
-  const subEl = document.getElementById('btn-sub');
-  if (!num) { numEl.textContent = '---'; subEl.textContent = ''; return; }
-  if (tpl) {
-    numEl.textContent = tpl.replace(/\{n\}/g, num);
-    subEl.textContent = '編號：' + num;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Per-group state
+const states = Array.from({length: GROUP_COUNT}, (_, i) => {
+  try {
+    const s = localStorage.getItem(STORE_KEY(i+1));
+    if (s) return JSON.parse(s);
+  } catch {}
+  return { number: '', template: '', history: [], lastDeleted: null };
+});
+
+function saveState(gi) {
+  const s = {...states[gi]};
+  delete s.lastDeleted; // don't persist undo across refresh
+  localStorage.setItem(STORE_KEY(gi+1), JSON.stringify(s));
+}
+
+function buildGroup(gi) {
+  const st = states[gi];
+  const gNum = gi + 1;
+
+  const div = document.createElement('div');
+  div.className = 'group';
+  div.id = `g${gi}`;
+  div.innerHTML = `
+    <div class="group-title">⚜ 組 ${gNum}</div>
+
+    <div>
+      <div class="field-label">當前編號（英數字，數字結尾）</div>
+      <input type="text" id="num-${gi}" placeholder="例：AA090801" spellcheck="false" autocomplete="off" value="${esc(st.number)}">
+    </div>
+
+    <div>
+      <div class="field-label">模板字串（選填） — 用 {n} 代表編號</div>
+      <textarea id="tpl-${gi}" placeholder="例：訂單-{n}-確認&#10;可多行輸入">${esc(st.template)}</textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="copy-btn" id="nbtn-${gi}">
+        <div class="btn-label">複製編號</div>
+        <div class="btn-val" id="nval-${gi}">---</div>
+      </button>
+      <button class="copy-btn" id="sbtn-${gi}">
+        <div class="btn-label">複製字串</div>
+        <div class="btn-val small" id="sval-${gi}">---</div>
+      </button>
+    </div>
+
+    <div class="hist-wrap">
+      <div class="hist-header">
+        <div class="hist-label">點擊歷史</div>
+        <div class="row-btns">
+          <button class="ghost-btn undo" id="undo-${gi}" style="display:none" onclick="undoDel(${gi})">↩ 恢復</button>
+          <button class="ghost-btn" onclick="exportCSV(${gi})">匯出 CSV</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="hist-list" id="hlist-${gi}"></div>
+      <div class="hist-empty" id="hempty-${gi}">尚無紀錄</div>
+    </div>
+  `;
+  document.getElementById('groups').appendChild(div);
+
+  // Events
+  document.getElementById(`num-${gi}`).addEventListener('input', () => {
+    states[gi].number = document.getElementById(`num-${gi}`).value;
+    updateBtns(gi);
+    saveState(gi);
+  });
+  document.getElementById(`tpl-${gi}`).addEventListener('input', () => {
+    states[gi].template = document.getElementById(`tpl-${gi}`).value;
+    updateBtns(gi);
+    saveState(gi);
+  });
+  document.getElementById(`nbtn-${gi}`).addEventListener('click', () => handleCopy(gi, 'num'));
+  document.getElementById(`sbtn-${gi}`).addEventListener('click', () => handleCopy(gi, 'str'));
+  document.getElementById(`num-${gi}`).addEventListener('keydown', e => { if (e.key === 'Enter') handleCopy(gi, 'num'); });
+
+  updateBtns(gi);
+  renderHistory(gi);
+}
+
+function updateBtns(gi) {
+  const st = states[gi];
+  const num = st.number.trim();
+  const tpl = st.template;
+  const str = applyTemplate(num, tpl);
+
+  const nval = document.getElementById(`nval-${gi}`);
+  const sval = document.getElementById(`sval-${gi}`);
+  const sbtn = document.getElementById(`sbtn-${gi}`);
+
+  nval.textContent = num || '---';
+  nval.className = 'btn-val';
+
+  if (str) {
+    sval.textContent = str;
+    sval.className = 'btn-val small';
+    sbtn.classList.remove('dim');
   } else {
-    numEl.textContent = num;
-    subEl.textContent = '';
+    sval.textContent = tpl.trim() ? '（請填入編號）' : '（未填模板）';
+    sval.className = 'btn-val small';
+    sbtn.classList.add('dim');
   }
 }
 
-function renderHistory() {
-  const list  = document.getElementById('hist-list');
-  const empty = document.getElementById('hist-empty');
-  empty.style.display = history.length ? 'none' : 'block';
+function handleCopy(gi, type) {
+  const st = states[gi];
+  const num = st.number.trim();
+  if (!num) { showToast('請先輸入編號'); return; }
+  if (!splitSerial(num)) { showToast('編號必須以數字結尾'); return; }
+
+  let copyText, label;
+  if (type === 'num') {
+    copyText = num;
+    label = '編號 ' + num;
+  } else {
+    const str = applyTemplate(num, st.template);
+    if (!str) { showToast('請先填入模板字串'); return; }
+    copyText = str;
+    label = '字串';
+  }
+
+  navigator.clipboard.writeText(copyText)
+    .then(() => showToast('已複製：' + (copyText.length > 30 ? copyText.slice(0,30)+'…' : copyText)))
+    .catch(() => showToast('複製失敗'));
+
+  st.history.push({ display: copyText, number: num, type, time: nowStr() });
+
+  const next = incrementSerial(num);
+  st.number = next;
+  document.getElementById(`num-${gi}`).value = next;
+
+  updateBtns(gi);
+  renderHistory(gi);
+  saveState(gi);
+}
+
+function renderHistory(gi) {
+  const st = states[gi];
+  const list  = document.getElementById(`hlist-${gi}`);
+  const empty = document.getElementById(`hempty-${gi}`);
+  empty.style.display = st.history.length ? 'none' : 'block';
   list.innerHTML = '';
-  [...history].reverse().forEach((item, ri) => {
-    const idx = history.length - 1 - ri;
+  [...st.history].reverse().forEach((item, ri) => {
+    const idx = st.history.length - 1 - ri;
     const div = document.createElement('div');
     div.className = 'hist-item';
     div.innerHTML = `
@@ -305,80 +406,46 @@ function renderHistory() {
         <div class="hist-code">${esc(item.display)}</div>
         <div class="hist-time">${esc(item.time)}</div>
       </div>
-      <button class="x-btn" data-idx="${idx}" title="刪除">✕</button>`;
-    div.querySelector('.x-btn').addEventListener('click', () => deleteItem(idx));
+      <button class="x-btn" title="刪除">✕</button>`;
+    div.querySelector('.x-btn').addEventListener('click', () => delHistory(gi, idx));
     list.appendChild(div);
   });
 }
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function delHistory(gi, idx) {
+  const st = states[gi];
+  st.lastDeleted = { item: st.history[idx], idx };
+  st.history.splice(idx, 1);
+  document.getElementById(`undo-${gi}`).style.display = '';
+  renderHistory(gi);
+  saveState(gi);
 }
 
-function handleClick() {
-  const num = document.getElementById('inp-number').value.trim();
-  if (!num) { showToast('請先輸入編號'); return; }
-  if (!splitSerial(num)) { showToast('編號必須以數字結尾'); return; }
-
-  const display = getDisplay(num);
-  navigator.clipboard.writeText(display)
-    .then(() => showToast('已複製：' + display))
-    .catch(() => showToast('複製失敗，請確認瀏覽器權限'));
-
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  const timeStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-  history.push({ display, number: num, time: timeStr });
-
-  document.getElementById('inp-number').value = incrementSerial(num);
-  updateUI();
-  renderHistory();
-  saveState();
+function undoDel(gi) {
+  const st = states[gi];
+  if (!st.lastDeleted) return;
+  st.history.splice(st.lastDeleted.idx, 0, st.lastDeleted.item);
+  st.lastDeleted = null;
+  document.getElementById(`undo-${gi}`).style.display = 'none';
+  renderHistory(gi);
+  saveState(gi);
 }
 
-function deleteItem(idx) {
-  lastDeleted = { item: history[idx], idx };
-  history.splice(idx, 1);
-  document.getElementById('undo-btn').style.display = '';
-  renderHistory();
-  saveState();
-}
-
-function undoDelete() {
-  if (!lastDeleted) return;
-  history.splice(lastDeleted.idx, 0, lastDeleted.item);
-  lastDeleted = null;
-  document.getElementById('undo-btn').style.display = 'none';
-  renderHistory();
-  saveState();
-}
-
-function exportCSV() {
-  if (!history.length) { showToast('沒有紀錄可匯出'); return; }
-  const rows = [['時間','複製內容','編號']];
-  history.forEach(h => rows.push([h.time, h.display, h.number]));
+function exportCSV(gi) {
+  const st = states[gi];
+  if (!st.history.length) { showToast('沒有紀錄可匯出'); return; }
+  const rows = [['時間','類型','複製內容','當時編號']];
+  st.history.forEach(h => rows.push([h.time, h.type === 'num' ? '編號' : '字串', h.display, h.number]));
   const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const blob = new Blob(['﻿'+csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'serial_history.csv';
+  a.download = `serial_g${gi+1}_history.csv`;
   a.click();
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
-}
-
-document.getElementById('inp-number').addEventListener('input', () => { updateUI(); saveState(); });
-document.getElementById('inp-template').addEventListener('input', () => { updateUI(); saveState(); });
-document.getElementById('inp-number').addEventListener('keydown', e => { if (e.key === 'Enter') handleClick(); });
-
-loadState();
-updateUI();
-renderHistory();
+// Init
+for (let i = 0; i < GROUP_COUNT; i++) buildGroup(i);
 </script>
 </body>
 </html>
