@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>MP4 / MOV 批量轉 GIF</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+    .container { width: 100%; max-width: 680px; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: #f1f5f9; }
+    .subtitle { font-size: 13px; color: #4a5568; margin-bottom: 24px; }
+
+    /* Dropzone */
+    #dropzone {
+      border: 2px dashed #3d4766;
+      border-radius: 12px;
+      padding: 44px 20px;
+      text-align: center;
+      cursor: pointer;
+      color: #7a88a0;
+      font-size: 15px;
+      transition: all 0.2s;
+      user-select: none;
+      margin-bottom: 20px;
+    }
+    #dropzone:hover, #dropzone.drag-over {
+      border-color: #22c55e;
+      color: #22c55e;
+      background: rgba(34,197,94,0.04);
+    }
+    #dropzone .icon { font-size: 32px; margin-bottom: 8px; }
+    #dropzone small { display: block; margin-top: 6px; color: #4a5568; font-size: 12px; }
+
+    /* Settings bar */
+    .settings-bar {
+      background: #1a1f2e;
+      border: 1px solid #2d3555;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .settings-row {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .setting-item { display: flex; align-items: center; gap: 8px; }
+    .setting-item label { font-size: 13px; color: #a0aec0; white-space: nowrap; }
+    select {
+      background: #252d42;
+      border: 1px solid #3d4766;
+      border-radius: 8px;
+      color: #e2e8f0;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    select:focus { outline: none; border-color: #22c55e; }
+
+    /* Toggle switch */
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+    .toggle-wrap label { font-size: 13px; color: #a0aec0; white-space: nowrap; cursor: pointer; }
+    .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: #3d4766; border-radius: 20px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: #22c55e; }
+    .toggle-track::after {
+      content: ''; position: absolute;
+      top: 3px; left: 3px;
+      width: 14px; height: 14px;
+      background: #fff; border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-track::after { transform: translateX(16px); }
+
+    /* Action buttons */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 11px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: #22c55e; color: #fff; flex: 1; }
+    .btn-primary:hover { background: #16a34a; }
+    .btn-primary:disabled { background: #3d4766; cursor: not-allowed; }
+    .btn-ghost {
+      background: #252d42;
+      color: #a0aec0;
+      border: 1px solid #3d4766;
+    }
+    .btn-ghost:hover { background: #2d3555; color: #e2e8f0; }
+
+    /* File queue */
+    #queue { display: flex; flex-direction: column; gap: 10px; }
+
+    .file-item {
+      background: #1a1f2e;
+      border: 1px solid #2d3555;
+      border-radius: 10px;
+      padding: 14px 16px;
+      transition: border-color 0.2s;
+    }
+    .file-item.converting { border-color: #22c55e; }
+    .file-item.done { border-color: #3d4766; }
+    .file-item.error { border-color: #ef4444; }
+
+    .file-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .file-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 350px;
+    }
+    .file-status {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .status-waiting  { background: #252d42; color: #7a88a0; }
+    .status-converting { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .status-done     { background: rgba(34,197,94,0.1); color: #4ade80; }
+    .status-error    { background: rgba(239,68,68,0.1); color: #f87171; }
+
+    .file-meta { font-size: 11px; color: #4a5568; margin-bottom: 6px; }
+    .file-timer { font-size: 11px; color: #7a88a0; margin-top: 4px; }
+
+    /* Per-file progress */
+    .file-progress { display: none; }
+    .bar-bg { background: #252d42; border-radius: 4px; height: 5px; overflow: hidden; margin-bottom: 4px; }
+    .bar-fill { height: 100%; background: #22c55e; border-radius: 4px; width: 0%; transition: width 0.3s; }
+    .bar-label { font-size: 11px; color: #7a88a0; }
+
+    /* Per-file result */
+    .file-result {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .file-size { font-size: 13px; font-weight: 600; color: #22c55e; }
+    .file-size.over { color: #f59e0b; }
+    .dl-btn {
+      padding: 5px 14px;
+      background: #22c55e;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .dl-btn:hover { background: #16a34a; }
+    .dl-btn.over { background: #f59e0b; }
+
+    .file-error-msg { font-size: 12px; color: #f87171; margin-top: 4px; }
+
+    /* Remove button */
+    .remove-btn {
+      background: none;
+      border: none;
+      color: #4a5568;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0 0 0 8px;
+      line-height: 1;
+    }
+    .remove-btn:hover { color: #ef4444; }
+
+    /* Summary */
+    #summary {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #1a1f2e;
+      border: 1px solid #2d3555;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #7a88a0;
+      display: none;
+    }
+    #summary .done-count { color: #22c55e; font-weight: 600; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎬 MP4 / MOV 批量轉 GIF</h1>
+  <p class="subtitle">支援一次選多個 MP4 / MOV，依序自動轉換</p>
+
+  <div id="dropzone">
+    <div class="icon">📁</div>
+    拖曳多個 MP4 / MOV 到這裡，或點擊選擇檔案
+    <small>可一次選多個檔案 · 全程在瀏覽器完成，不上傳伺服器</small>
+  </div>
+  <input type="file" id="fileInput" accept="video/*" multiple hidden>
+
+  <div class="settings-bar" id="settingsBar">
+    <div class="settings-row">
+      <div class="setting-item">
+        <label>FPS</label>
+        <select id="fpsSel">
+          <option value="0.5">0.5 fps（每2秒1張）</option>
+          <option value="1">1 fps（投影片）</option>
+          <option value="2">2 fps</option>
+          <option value="5">5 fps</option>
+          <option value="8" selected>8 fps（LINE 推薦）</option>
+          <option value="10">10 fps</option>
+          <option value="15">15 fps</option>
+          <option value="24">24 fps</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>畫質模式</label>
+        <select id="ditherSel">
+          <option value="text">文字/投影片（清晰邊緣）</option>
+          <option value="photo">含圖片/漸層（色彩更豐富）</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>輸出寬度</label>
+        <select id="widthSel">
+          <option value="0">原始大小</option>
+          <option value="1280">1280px</option>
+          <option value="960">960px</option>
+          <option value="640" selected>640px（LINE 推薦）</option>
+          <option value="480">480px</option>
+          <option value="360">360px</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label>播放速度</label>
+        <select id="speedSel">
+          <option value="0.25">0.25x（超慢）</option>
+          <option value="0.5">0.5x（慢速）</option>
+          <option value="0.75">0.75x（略慢）</option>
+          <option value="1" selected>1x（原速）</option>
+          <option value="1.5">1.5x（略快）</option>
+          <option value="2">2x（快速）</option>
+          <option value="3">3x（3倍速）</option>
+          <option value="4">4x（超快）</option>
+        </select>
+      </div>
+      <div class="setting-item toggle-wrap">
+        <label class="toggle">
+          <input type="checkbox" id="autoDownload" checked>
+          <span class="toggle-track"></span>
+        </label>
+        <label for="autoDownload">自動下載</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row" id="actionRow" style="display:none">
+    <button class="btn btn-ghost" id="clearBtn">清空列表</button>
+    <button class="btn btn-ghost" id="freeMemBtn" title="釋放所有已轉換 GIF 的記憶體">🗑 清除記憶體</button>
+    <button class="btn btn-primary" id="convertAllBtn">開始批量轉換 →</button>
+  </div>
+
+  <div style="background:rgba(34,197,94,0.07);border:1px solid #22c55e33;border-radius:8px;padding:10px 14px;font-size:12px;color:#4ade80;margin-bottom:16px;display:none" id="lineTip">
+    💡 LINE 手機聊天室顯示 GIF 約 300-400px 寬，超過 640px 只是多佔容量而不會更清晰。
+  </div>
+  <div id="queue"></div>
+
+  <div id="summary"></div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────
+let files = [];          // { file, id, status, gifURL, size }
+let workerBlobURL = null;
+let gifLibLoaded  = false;
+let converting    = false;
+let idCounter     = 0;
+
+// ─── DOM ─────────────────────────────────────────────────
+const dropzone     = document.getElementById('dropzone');
+const fileInput    = document.getElementById('fileInput');
+const settingsBar  = document.getElementById('settingsBar');
+const actionRow    = document.getElementById('actionRow');
+const queue        = document.getElementById('queue');
+const convertAllBtn= document.getElementById('convertAllBtn');
+const clearBtn     = document.getElementById('clearBtn');
+const freeMemBtn   = document.getElementById('freeMemBtn');
+const fpsSel       = document.getElementById('fpsSel');
+const widthSel     = document.getElementById('widthSel');
+const summary      = document.getElementById('summary');
+
+// ─── File drop / pick ────────────────────────────────────
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('drag-over');
+  addFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('video/')));
+});
+fileInput.addEventListener('change', e => {
+  addFiles(Array.from(e.target.files));
+  fileInput.value = '';
+});
+
+function addFiles(newFiles) {
+  for (const f of newFiles) {
+    const id = ++idCounter;
+    const entry = { file: f, id, status: 'waiting', gifURL: null, size: 0 };
+    files.push(entry);
+    renderItem(entry);
+  }
+  if (files.length > 0) {
+    settingsBar.style.display = 'block';
+    actionRow.style.display = 'flex';
+    document.getElementById('lineTip').style.display = 'block';
+    updateSummary();
+  }
+}
+
+// ─── Render one queue item ────────────────────────────────
+function renderItem(entry) {
+  const div = document.createElement('div');
+  div.className = 'file-item';
+  div.id = 'item-' + entry.id;
+  div.innerHTML = `
+    <div class="file-header">
+      <div class="file-name" title="${entry.file.name}">${entry.file.name}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="file-status status-waiting" id="status-${entry.id}">等待中</span>
+        <button class="remove-btn" id="rm-${entry.id}" title="移除">✕</button>
+      </div>
+    </div>
+    <div class="file-meta" id="meta-${entry.id}">
+      ${fmtFileSize(entry.file.size)} · 讀取中...
+    </div>
+    <div class="file-progress" id="prog-${entry.id}">
+      <div class="bar-bg"><div class="bar-fill" id="bar-${entry.id}"></div></div>
+      <div class="bar-label" id="barlabel-${entry.id}">準備中...</div>
+    </div>
+    <div class="file-result" id="result-${entry.id}">
+      <span class="file-size" id="size-${entry.id}"></span>
+      <a class="dl-btn" id="dl-${entry.id}" download="${entry.file.name.replace(/\.[^.]+$/, '')}.gif">⬇ 下載 GIF</a>
+    </div>
+    <div class="file-error-msg" id="err-${entry.id}" style="display:none"></div>
+    <div class="file-timer" id="timer-${entry.id}" style="display:none"></div>
+  `;
+  queue.appendChild(div);
+
+  // Read video metadata
+  const video = document.createElement('video');
+  video.preload = 'metadata';
+  video.src = URL.createObjectURL(entry.file);
+  video.addEventListener('loadedmetadata', () => {
+    const dur = video.duration;
+    const w = video.videoWidth, h = video.videoHeight;
+    entry.videoW = w; entry.videoH = h; entry.duration = dur;
+    const el = document.getElementById('meta-' + entry.id);
+    if (el) el.textContent = `${w}×${h} · ${fmtDur(dur)} · ${fmtFileSize(entry.file.size)}`;
+    URL.revokeObjectURL(video.src);
+  }, { once: true });
+
+  document.getElementById('rm-' + entry.id).addEventListener('click', () => {
+    if (entry.status === 'converting') return;
+    files = files.filter(f => f.id !== entry.id);
+    div.remove();
+    if (files.length === 0) {
+      settingsBar.style.display = 'none';
+      actionRow.style.display = 'none';
+      summary.style.display = 'none';
+    }
+    updateSummary();
+  });
+}
+
+// ─── Update item status in DOM ────────────────────────────
+function setItemStatus(id, status, label) {
+  const el  = document.getElementById('status-' + id);
+  const item = document.getElementById('item-' + id);
+  if (!el || !item) return;
+  el.className = 'file-status status-' + status;
+  el.textContent = label;
+  item.className = 'file-item ' + status;
+}
+function setBar(id, pct, label) {
+  const bar = document.getElementById('bar-' + id);
+  const lbl = document.getElementById('barlabel-' + id);
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = label;
+}
+function showProg(id, show) {
+  const el = document.getElementById('prog-' + id);
+  if (el) el.style.display = show ? 'block' : 'none';
+}
+
+// ─── Summary ─────────────────────────────────────────────
+function updateSummary(runningMs, finalMs) {
+  if (files.length === 0) { summary.style.display = 'none'; return; }
+  const done  = files.filter(f => f.status === 'done').length;
+  const error = files.filter(f => f.status === 'error').length;
+  let timeStr = '';
+  if (finalMs != null) {
+    timeStr = ` · 總耗時 ${fmtElapsed(finalMs)}`;
+  } else if (runningMs != null) {
+    timeStr = ` · ⏱ ${fmtElapsed(runningMs)}`;
+  }
+  summary.style.display = 'block';
+  summary.innerHTML = `共 ${files.length} 個檔案 · <span class="done-count">${done} 完成</span>${error ? ' · ' + error + ' 失敗' : ''}${timeStr}`;
+}
+
+// ─── Helpers ─────────────────────────────────────────────
+function fmtDur(s) {
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+  return m + ':' + String(sec).padStart(2, '0');
+}
+function fmtElapsed(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  return m > 0 ? `${m}m ${s % 60}s` : `${s}s`;
+}
+function fmtFileSize(b) {
+  return (b / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+// ─── Load GIF library ────────────────────────────────────
+async function ensureGifLib() {
+  if (gifLibLoaded) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js';
+    s.onload = res;
+    s.onerror = () => rej(new Error('無法載入 gif.js，請確認網路連線'));
+    document.head.appendChild(s);
+  });
+  const resp = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
+  if (!resp.ok) throw new Error('無法載入 gif.worker.js');
+  const blob = new Blob([await resp.text()], { type: 'application/javascript' });
+  workerBlobURL = URL.createObjectURL(blob);
+  gifLibLoaded = true;
+}
+
+// ─── Seek helper ─────────────────────────────────────────
+function seekTo(vid, time) {
+  return new Promise(resolve => {
+    if (Math.abs(vid.currentTime - time) < 0.001) { resolve(); return; }
+    const h = () => { vid.removeEventListener('seeked', h); resolve(); };
+    vid.addEventListener('seeked', h);
+    vid.currentTime = time;
+  });
+}
+
+// ─── Black frame detection ────────────────────────────────
+// Returns true if avg brightness < 1% of 255 (effectively black screen).
+function isBlackFrame(ctx, w, h) {
+  const d    = ctx.getImageData(0, 0, w, h).data;
+  const step = Math.max(4, Math.floor(d.length / 4000)) * 4;
+  let sum = 0, count = 0;
+  for (let i = 0; i < d.length; i += step) {
+    sum += d[i] + d[i + 1] + d[i + 2];
+    count += 3;
+  }
+  return (sum / count / 255) < 0.01;
+}
+
+// ─── Frame similarity check ───────────────────────────────
+// Two frames are "the same" only if avg pixel difference < 5% (95% similarity).
+// Samples ~1000 pixels evenly for speed.
+function framesSimilar(ctx1, ctx2, w, h) {
+  const DIFF_LIMIT = 0.01; // 1% of 255 = frames must be ≥ 99% identical
+  const d1   = ctx1.getImageData(0, 0, w, h).data;
+  const d2   = ctx2.getImageData(0, 0, w, h).data;
+  const step = Math.max(4, Math.floor(d1.length / 4000)) * 4;
+  let diff = 0, count = 0;
+  for (let i = 0; i < d1.length; i += step) {
+    diff += Math.abs(d1[i]   - d2[i])     // R
+          + Math.abs(d1[i+1] - d2[i+1])   // G
+          + Math.abs(d1[i+2] - d2[i+2]);  // B
+    count += 3;
+  }
+  // diff/count = avg absolute diff per channel (0-255); divide by 255 → percentage
+  return (diff / count / 255) < DIFF_LIMIT;
+}
+
+// ─── Encode one pass ─────────────────────────────────────
+function getDitherMode() {
+  const sel = document.getElementById('ditherSel').value;
+  return sel;
+}
+
+function getSpeed() {
+  return parseFloat(document.getElementById('speedSel').value) || 1;
+}
+
+async function encodePass(entry, video, outW, outH, fps, attempt) {
+  const MAX_DUR = 30; // seconds cap
+  const duration = Math.min(video.duration, MAX_DUR);
+  const total    = Math.ceil(duration * fps);
+  const delay    = Math.round(1000 / fps);
+  const speed    = getSpeed();
+  const prefix   = attempt > 1 ? `第${attempt}次（${outW}px）` : '';
+
+  const dither  = getDitherMode();
+  const canvas  = document.createElement('canvas');
+  canvas.width  = outW;
+  canvas.height = outH;
+  const ctx = canvas.getContext('2d');
+
+  // For photo/gradient mode: use image smoothing for better color blending
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  const gif = new GIF({
+    workers:      4,
+    quality:      1,      // 1 = highest quality palette
+    width:        outW,
+    height:       outH,
+    workerScript: workerBlobURL,
+    repeat:       0,
+    dither:       dither === 'photo' ? 'FloydSteinberg' : false
+  });
+
+  // Frame deduplication: identical consecutive frames extend delay instead of being re-stored
+  // Leading black frames (before first real content) are skipped entirely.
+  let prevCanvas = null, prevCtx = null, accDelay = 0, uniqueCount = 0;
+  let leadingBlackDone = false; // set to true once first non-black frame is seen
+
+  for (let i = 0; i < total; i++) {
+    await seekTo(video, i / fps);
+    ctx.drawImage(video, 0, 0, outW, outH);
+
+    // Skip black frames that appear before any real content
+    if (!leadingBlackDone && isBlackFrame(ctx, outW, outH)) {
+      const pct = 5 + Math.round((i + 1) / total * 55);
+      setBar(entry.id, pct, `${prefix}跳過黑幀 ${i + 1}/${total}`);
+      continue;
+    }
+    leadingBlackDone = true;
+
+    const isNew = (prevCanvas === null) || !framesSimilar(prevCtx, ctx, outW, outH);
+
+    if (isNew) {
+      if (prevCanvas !== null) {
+        gif.addFrame(prevCtx, { delay: Math.max(2, Math.round(accDelay / speed)), copy: true });
+        uniqueCount++;
+      }
+      // Clone into a dedicated canvas so we can reuse ctx next iteration
+      if (!prevCanvas) {
+        prevCanvas = document.createElement('canvas');
+        prevCanvas.width = outW; prevCanvas.height = outH;
+        prevCtx = prevCanvas.getContext('2d');
+      }
+      prevCtx.drawImage(canvas, 0, 0);
+      accDelay = delay;
+    } else {
+      accDelay += delay; // same frame — extend hold time
+    }
+
+    const pct = 5 + Math.round((i + 1) / total * 55);
+    setBar(entry.id, pct, `${prefix}擷取 ${i + 1}/${total} · ${uniqueCount + 1} 唯一幀`);
+  }
+  // Flush last frame
+  if (prevCanvas) {
+    gif.addFrame(prevCtx, { delay: Math.max(2, Math.round(accDelay / speed)), copy: true });
+    uniqueCount++;
+  }
+
+  setBar(entry.id, 62, `${prefix}編碼中...`);
+
+  return new Promise((resolve, reject) => {
+    gif.on('progress', p => {
+      setBar(entry.id, 62 + Math.round(p * 36), `${prefix}編碼 ${Math.round(p * 100)}%`);
+    });
+    gif.on('finished', resolve);
+    gif.on('error', reject);
+    gif.render();
+  });
+}
+
+// ─── Convert one file (with auto-recompress) ─────────────
+async function convertOne(entry) {
+  const fps     = parseFloat(fpsSel.value);
+  const targetW = parseInt(widthSel.value);
+  const SIZE_LIMIT   = 20 * 1024 * 1024;
+
+  setItemStatus(entry.id, 'converting', '轉換中');
+  showProg(entry.id, true);
+  setBar(entry.id, 0, '載入影片...');
+
+  const video = document.createElement('video');
+  video.muted = true;
+  const videoURL = URL.createObjectURL(entry.file);
+  await new Promise((res, rej) => {
+    video.src = videoURL;
+    video.addEventListener('loadeddata', res, { once: true });
+    video.addEventListener('error', () => rej(new Error('影片載入失敗')), { once: true });
+    video.load();
+  });
+
+  const origW    = video.videoWidth;
+  const origH    = video.videoHeight;
+  const maxDur   = Math.min(video.duration, 30);
+  const baseW    = (targetW > 0 && targetW < origW) ? targetW : origW;
+
+  // Update meta
+  const metaEl = document.getElementById('meta-' + entry.id);
+  const totalFrameCount = Math.ceil(maxDur * fps);
+  if (metaEl) {
+    const cut = video.duration > 30 ? '（截取前30秒）' : '';
+    metaEl.textContent = `${origW}×${origH} · 最多 ${totalFrameCount} 幀 · ${fmtDur(maxDur)}${cut}`;
+  }
+
+  const TARGET  = 20 * 1024 * 1024; // aim for 20 MB
+  const MIN_FPS = 1;
+  const MIN_W   = 320;
+  const MARGIN  = 0.97; // slight undershot safety
+
+  let blob;
+  let curFps = fps;
+  let curW   = baseW;
+
+  // ── Attempt 1: user's settings ──
+  blob = await encodePass(entry, video, curW, Math.round(curW * origH / origW), curFps, 1);
+
+  // ── Attempt 2: reduce FPS proportionally (keeps resolution sharp) ──
+  if (blob.size > SIZE_LIMIT) {
+    const nextFps = Math.max(parseFloat((curFps * (TARGET / blob.size) * MARGIN).toFixed(1)), MIN_FPS);
+    const nowMB   = (blob.size / 1024 / 1024).toFixed(1);
+    setBar(entry.id, 0, `${nowMB} MB > 20MB，FPS 降至 ${nextFps} 重試...`);
+    await new Promise(r => setTimeout(r, 300));
+    curFps = nextFps;
+    blob   = await encodePass(entry, video, curW, Math.round(curW * origH / origW), curFps, 2);
+  }
+
+  // ── Attempt 3: reduce resolution (FPS already reduced) ──
+  if (blob.size > SIZE_LIMIT) {
+    const scale  = Math.sqrt(TARGET / blob.size) * MARGIN;
+    const nextW  = Math.max(Math.round(curW * scale), MIN_W);
+    const nowMB  = (blob.size / 1024 / 1024).toFixed(1);
+    setBar(entry.id, 0, `${nowMB} MB > 20MB，調整解析度至 ${nextW}px 重試...`);
+    await new Promise(r => setTimeout(r, 300));
+    curW = nextW;
+    blob = await encodePass(entry, video, curW, Math.round(curW * origH / origW), curFps, 3);
+  }
+
+  // ── Attempt 4: fine-tune if still slightly over ──
+  if (blob.size > SIZE_LIMIT) {
+    const scale  = Math.sqrt(TARGET / blob.size) * MARGIN;
+    const nextW  = Math.max(Math.round(curW * scale), MIN_W);
+    const nowMB  = (blob.size / 1024 / 1024).toFixed(1);
+    setBar(entry.id, 0, `${nowMB} MB > 20MB，最終微調至 ${nextW}px...`);
+    await new Promise(r => setTimeout(r, 300));
+    curW = nextW;
+    blob = await encodePass(entry, video, curW, Math.round(curW * origH / origW), curFps, 4);
+  }
+
+  URL.revokeObjectURL(videoURL);
+  setBar(entry.id, 100, '完成');
+
+  entry.status = 'done';
+  entry.gifURL = URL.createObjectURL(blob);
+  entry.size   = blob.size;
+
+  const over20 = blob.size > SIZE_LIMIT; // only true if all attempts failed
+  setItemStatus(entry.id, 'done', '✅ 完成');
+  showProg(entry.id, false);
+
+  const resultEl = document.getElementById('result-' + entry.id);
+  const sizeEl   = document.getElementById('size-' + entry.id);
+  const dlEl     = document.getElementById('dl-' + entry.id);
+  if (resultEl) resultEl.style.display = 'flex';
+  if (sizeEl) {
+    sizeEl.textContent = fmtFileSize(blob.size) + (over20 ? '（仍超過20MB）' : '');
+    sizeEl.className = 'file-size' + (over20 ? ' over' : '');
+  }
+  if (dlEl) {
+    dlEl.href = entry.gifURL;
+    if (over20) dlEl.className = 'dl-btn over';
+  }
+
+  // Auto-download + free memory if switch is on
+  if (document.getElementById('autoDownload').checked) {
+    const a = document.createElement('a');
+    a.href = entry.gifURL;
+    a.download = entry.file.name.replace(/\.[^.]+$/, '') + '.gif';
+    a.click();
+    // Revoke blob URL after a short delay to allow the download to start
+    setTimeout(() => {
+      URL.revokeObjectURL(entry.gifURL);
+      entry.gifURL = null;
+      if (dlEl) { dlEl.removeAttribute('href'); dlEl.style.opacity = '0.4'; dlEl.title = '已釋放記憶體'; }
+    }, 3000);
+  }
+}
+
+// ─── Convert all ─────────────────────────────────────────
+clearBtn.addEventListener('click', () => {
+  if (converting) return;
+  files.forEach(f => { if (f.gifURL) URL.revokeObjectURL(f.gifURL); });
+  files = [];
+  queue.innerHTML = '';
+  settingsBar.style.display = 'none';
+  actionRow.style.display = 'none';
+  summary.style.display = 'none';
+});
+
+freeMemBtn.addEventListener('click', () => {
+  let freed = 0;
+  files.forEach(entry => {
+    if (entry.gifURL) {
+      URL.revokeObjectURL(entry.gifURL);
+      entry.gifURL = null;
+      freed++;
+      const dlEl = document.getElementById('dl-' + entry.id);
+      if (dlEl) { dlEl.removeAttribute('href'); dlEl.style.opacity = '0.4'; dlEl.title = '已釋放記憶體'; }
+      const timerEl = document.getElementById('timer-' + entry.id);
+      if (timerEl && timerEl.textContent) timerEl.textContent += '（記憶體已釋放）';
+    }
+  });
+  freeMemBtn.textContent = freed ? `✓ 已釋放 ${freed} 個` : '無可釋放';
+  setTimeout(() => { freeMemBtn.textContent = '🗑 清除記憶體'; }, 2000);
+});
+
+convertAllBtn.addEventListener('click', async () => {
+  if (converting) return;
+  converting = true;
+  convertAllBtn.disabled = true;
+  convertAllBtn.textContent = '轉換中...';
+  clearBtn.disabled = true;
+
+  try {
+    await ensureGifLib();
+  } catch (e) {
+    alert('無法載入 GIF 函式庫：' + e.message);
+    converting = false;
+    convertAllBtn.disabled = false;
+    convertAllBtn.textContent = '開始批量轉換 →';
+    clearBtn.disabled = false;
+    return;
+  }
+
+  const pending = files.filter(f => f.status === 'waiting');
+  const totalStart = Date.now();
+  let totalTimerInterval = setInterval(() => {
+    updateSummary(Date.now() - totalStart);
+  }, 1000);
+
+  for (const entry of pending) {
+    const fileStart = Date.now();
+    const timerEl = document.getElementById('timer-' + entry.id);
+    if (timerEl) { timerEl.style.display = 'block'; timerEl.textContent = '⏱ 處理中 0s'; }
+    const fileTimer = setInterval(() => {
+      if (timerEl) timerEl.textContent = `⏱ 處理中 ${fmtElapsed(Date.now() - fileStart)}`;
+    }, 1000);
+
+    try {
+      await convertOne(entry);
+      clearInterval(fileTimer);
+      const elapsed = Date.now() - fileStart;
+      if (timerEl) timerEl.textContent = `⏱ 耗時 ${fmtElapsed(elapsed)}`;
+    } catch (e) {
+      clearInterval(fileTimer);
+      const elapsed = Date.now() - fileStart;
+      if (timerEl) timerEl.textContent = `⏱ 耗時 ${fmtElapsed(elapsed)}`;
+      entry.status = 'error';
+      setItemStatus(entry.id, 'error', '❌ 失敗');
+      showProg(entry.id, false);
+      const errEl = document.getElementById('err-' + entry.id);
+      if (errEl) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+    }
+    updateSummary(Date.now() - totalStart);
+  }
+
+  clearInterval(totalTimerInterval);
+  const totalElapsed = Date.now() - totalStart;
+  updateSummary(null, totalElapsed);
+
+  converting = false;
+  convertAllBtn.disabled = false;
+  convertAllBtn.textContent = '開始批量轉換 →';
+  clearBtn.disabled = false;
+});
+</script>
+</body>
+</html>
