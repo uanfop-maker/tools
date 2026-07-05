@@ -76,9 +76,13 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
   </a>
 </div>
 
-<div id="_sg" style="display:none">
-  <div class="section-title" id="_st"></div>
-  <div class="grid" id="_sc"></div>
+<div id="_sg1" style="display:none">
+  <div class="section-title" id="_st1"></div>
+  <div class="grid" id="_sc1"></div>
+</div>
+<div id="_sg2" style="display:none">
+  <div class="section-title" id="_st2"></div>
+  <div class="grid" id="_sc2"></div>
 </div>
 
 <div class="section-title">Chrome 插件</div>
@@ -136,23 +140,26 @@ function copyReport() {
 
 // Secret tools (obfuscated)
 var _f = String.fromCharCode;
-var _k = [0x829d,0x9ebb,0x958b,0x9580];
-var _td = [
+var _k1 = [116,115,109,99];                        // tsmc (case-insensitive)
+var _k2 = [0x829d,0x9ebb,0x958b,0x9580];           // 芝麻開門
+var _td1 = [
   { i:'🔢', n:[0x6d41,0x6c34,0x7de8,0x865f,0x7522,0x751f,0x5668],
     d:'設定初始編號，按鈕一鍵複製並自動 +1。支援英數混合（如 AA090801），可自行增減組數（最少 1 組），可套用模板字串、匯出 CSV 歷史。',
-    h:[115,101,114,105,97,108,46,104,116,109,108], b:'本地運算' },
+    h:[115,101,114,105,97,108,46,104,116,109,108], b:'本地運算' }
+];
+var _td2 = [
   { i:'🏦', n:[0x47,0x53,0x31,0x20,0x96fb,0x5b50,0x5e33,0x55ae,0x7522,0x751f,0x5668],
     d:'7-11 超商繳費電子帳單模擬器，支援玉山 / MC（智冠）兩種格式切換（各自背景），一鍵截圖：手機自動用分享功能，桌機複製到剪貼簿。',
     h:[103,115,49,95,116,57,46,104,116,109,108], b:'本地運算' }
 ];
 
-function _bsg() {
-  var g = document.getElementById('_sc');
-  var t = document.getElementById('_st');
+function _bsg(td, gid, tid, title) {
+  var g = document.getElementById(gid);
+  var t = document.getElementById(tid);
   if (!g) return;
-  t.textContent = '🔑 進階工具';
+  t.textContent = title;
   g.innerHTML = '';
-  _td.forEach(function(x) {
+  td.forEach(function(x) {
     var a = document.createElement('a');
     a.className = 'card';
     a.href = x.h.map(function(c){return _f(c);}).join('');
@@ -166,11 +173,18 @@ function _bsg() {
 
 function clearForm() {
   var desc = document.getElementById('fb-desc').value;
-  var magic = _k.map(function(c){return _f(c);}).join('');
-  var sg = document.getElementById('_sg');
-  if (desc === magic && sg) {
-    _bsg();
-    sg.style.display = sg.style.display === 'none' ? 'block' : 'none';
+  var d = desc.trim();
+  var m1 = _k1.map(function(c){return _f(c);}).join('');
+  var m2 = _k2.map(function(c){return _f(c);}).join('');
+  var sg1 = document.getElementById('_sg1');
+  var sg2 = document.getElementById('_sg2');
+  if (d.toLowerCase() === m1 && sg1) {
+    _bsg(_td1, '_sc1', '_st1', '🔓 工具');
+    sg1.style.display = sg1.style.display === 'none' ? 'block' : 'none';
+  }
+  if (d === m2 && sg2) {
+    _bsg(_td2, '_sc2', '_st2', '🔑 進階工具');
+    sg2.style.display = sg2.style.display === 'none' ? 'block' : 'none';
   }
   document.getElementById('fb-tool').value = '';
   document.getElementById('fb-desc').value = '';
