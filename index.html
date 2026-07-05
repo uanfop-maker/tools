@@ -23,6 +23,17 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 /* Section divider */
 .section-title { font-size: 1rem; font-weight: 600; color: #888; letter-spacing: .04em; margin-bottom: 16px; margin-top: 8px; text-transform: uppercase; }
 
+/* Chrome extension cards */
+.ext-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; max-width: 900px; margin-bottom: 56px; }
+.ext-card { background: #111b2e; border: 1px solid #1e3050; border-radius: 14px; padding: 20px 20px 18px; color: inherit; }
+.ext-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.ext-card .desc { font-size: 0.82rem; color: #777; line-height: 1.55; margin-bottom: 16px; }
+.ext-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-dl { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #2e6be6; color: #fff; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+.btn-dl:hover { opacity: .85; }
+.btn-guide { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #1e1e1e; border: 1px solid #333; color: #bbb; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: background .15s; }
+.btn-guide:hover { background: #272727; }
+
 /* Feedback form */
 .feedback-box { max-width: 560px; background: #151515; border: 1px solid #2a2a2a; border-radius: 16px; padding: 28px 24px; }
 .feedback-box h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; color: #f0f0f0; }
@@ -73,11 +84,18 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
     <div class="desc">7-11 超商繳費電子帳單模擬器，支援玉山 / MC（智冠）兩種格式切換（各自背景），一鍵截圖：手機自動用分享功能，桌機複製到剪貼簿。</div>
     <span class="badge">本地運算</span>
   </a>
-  <a class="card" href="grok-history-scroll.html">
-    <div class="card-top"><div class="icon">📜</div><div class="name">Grok 歷史無限滾動</div></div>
-    <div class="desc">讓 Grok 對話歷史列表可以無限往下滾，自動載入所有紀錄。安裝說明 + 下載頁面。</div>
-    <span class="badge">瀏覽器擴充</span>
-  </a>
+</div>
+
+<div class="section-title">Chrome 插件</div>
+<div class="ext-grid">
+  <div class="ext-card">
+    <div class="ext-card-top"><div class="icon">📜</div><div class="name" style="font-weight:600;font-size:.97rem;color:#f0f0f0;">Grok 歷史無限滾動</div></div>
+    <div class="desc">讓 Grok 對話歷史列表可以無限往下滾，自動載入所有對話紀錄。適用 Chrome / Edge。</div>
+    <div class="ext-actions">
+      <a class="btn-dl" href="grok-history-scroll.zip" download>⬇ 下載 .zip</a>
+      <a class="btn-guide" href="grok-history-scroll.html" target="_blank">📖 安裝說明</a>
+    </div>
+  </div>
 </div>
 
 <div class="section-title">問題回報</div>
