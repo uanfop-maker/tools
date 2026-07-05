@@ -45,14 +45,30 @@ body {
   gap: 12px;
 }
 .group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 0.7rem;
   color: #c9a84caa;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  text-align: center;
   padding-bottom: 10px;
   border-bottom: 1px solid #c9a84c18;
 }
+.group-title-text { flex: 1; text-align: center; }
+.remove-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #c9a84c33;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  line-height: 1;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.remove-btn:hover { color: #e05252; border-color: #e0525244; background: #3a1010; }
 .field-label {
   font-size: 0.65rem;
   color: #c9a84c77;
@@ -191,6 +207,25 @@ textarea {
 .x-btn:hover { color: #c9a84c; background: #c9a84c18; }
 .hist-empty { text-align: center; color: #33446688; padding: 20px 0; font-size: 0.78rem; }
 
+/* Add group row */
+.add-row {
+  max-width: 1200px;
+  margin: 16px auto 0;
+  text-align: center;
+}
+.add-btn {
+  background: none;
+  border: 1px solid #c9a84c44;
+  border-radius: 9px;
+  color: #c9a84c99;
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 9px 28px;
+  letter-spacing: 0.08em;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.add-btn:hover { background: #c9a84c18; color: #c9a84c; border-color: #c9a84c77; }
+
 /* Toast */
 .toast {
   position: fixed;
@@ -218,11 +253,15 @@ textarea {
 
 <div class="page-title">⚜ 流水編號產生器</div>
 <div class="groups" id="groups"></div>
+<div class="add-row">
+  <button class="add-btn" onclick="addGroup()">＋ 新增組</button>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
-const GROUP_COUNT = 3;
-const STORE_KEY = g => `serial_v2_g${g}`;
+const STORE_KEY  = id => `serial_v2_g${id}`;
+const STORE_IDS  = 'serial_v2_groupIds';
+const STORE_CTR  = 'serial_v2_idCounter';
 
 function splitSerial(s) {
   const m = String(s).match(/^(.*?)(\d+)$/);
@@ -239,14 +278,11 @@ function applyTemplate(num, tpl) {
   return tpl.replace(/\{n\}/g, num);
 }
 function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function nowStr() {
-  const d = new Date();
-  const p = n => String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  return new Date().toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit' });
 }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -255,49 +291,86 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// Per-group state
-const states = Array.from({length: GROUP_COUNT}, (_, i) => {
+// ── Group ID management ───────────────────────────────────────────
+let groupIds = (() => {
+  try { const v = JSON.parse(localStorage.getItem(STORE_IDS)); if (Array.isArray(v) && v.length) return v; } catch {}
+  return [0, 1, 2];
+})();
+let idCounter = (() => {
+  try { const v = parseInt(localStorage.getItem(STORE_CTR)); if (!isNaN(v)) return v; } catch {}
+  return 3;
+})();
+
+function saveGroupLayout() {
+  localStorage.setItem(STORE_IDS, JSON.stringify(groupIds));
+  localStorage.setItem(STORE_CTR, String(idCounter));
+}
+
+// ── Per-group state ────────────────────────────────────────────────
+const states = {};
+
+function loadState(id) {
   try {
-    const s = localStorage.getItem(STORE_KEY(i+1));
+    const s = localStorage.getItem(STORE_KEY(id));
     if (s) return JSON.parse(s);
   } catch {}
   return { number: '', template: '', history: [], lastDeleted: null };
-});
-
-function saveState(gi) {
-  const s = {...states[gi]};
-  delete s.lastDeleted; // don't persist undo across refresh
-  localStorage.setItem(STORE_KEY(gi+1), JSON.stringify(s));
 }
 
-function buildGroup(gi) {
-  const st = states[gi];
-  const gNum = gi + 1;
+function saveState(id) {
+  const s = { ...states[id] };
+  delete s.lastDeleted;
+  localStorage.setItem(STORE_KEY(id), JSON.stringify(s));
+}
+
+// ── Refresh group numbering display ───────────────────────────────
+function refreshGroupNumbers() {
+  groupIds.forEach((id, idx) => {
+    const el = document.querySelector(`#g${id} .group-title-text`);
+    if (el) el.textContent = `⚜ 組 ${idx + 1}`;
+  });
+  // Show/hide remove buttons based on count
+  const canRemove = groupIds.length > 1;
+  groupIds.forEach(id => {
+    const btn = document.getElementById(`rbtn-${id}`);
+    if (btn) btn.style.visibility = canRemove ? 'visible' : 'hidden';
+  });
+}
+
+// ── Build / Remove / Add group ────────────────────────────────────
+function buildGroup(id) {
+  if (!states[id]) states[id] = loadState(id);
+  const st = states[id];
+  const gNum = groupIds.indexOf(id) + 1;
 
   const div = document.createElement('div');
   div.className = 'group';
-  div.id = `g${gi}`;
+  div.id = `g${id}`;
   div.innerHTML = `
-    <div class="group-title">⚜ 組 ${gNum}</div>
+    <div class="group-title">
+      <span style="width:20px"></span>
+      <span class="group-title-text">⚜ 組 ${gNum}</span>
+      <button class="remove-btn" id="rbtn-${id}" title="移除此組" onclick="removeGroup(${id})">✕</button>
+    </div>
 
     <div>
       <div class="field-label">當前編號（英數字，數字結尾）</div>
-      <input type="text" id="num-${gi}" placeholder="例：AA090801" spellcheck="false" autocomplete="off" value="${esc(st.number)}">
+      <input type="text" id="num-${id}" placeholder="例：AA090801" spellcheck="false" autocomplete="off" value="${esc(st.number)}">
     </div>
 
     <div>
       <div class="field-label">模板字串（選填） — 用 {n} 代表編號</div>
-      <textarea id="tpl-${gi}" placeholder="例：訂單-{n}-確認&#10;可多行輸入">${esc(st.template)}</textarea>
+      <textarea id="tpl-${id}" placeholder="例：訂單-{n}-確認&#10;可多行輸入">${esc(st.template)}</textarea>
     </div>
 
     <div class="btn-row">
-      <button class="copy-btn" id="nbtn-${gi}">
+      <button class="copy-btn" id="nbtn-${id}">
         <div class="btn-label">複製編號</div>
-        <div class="btn-val" id="nval-${gi}">---</div>
+        <div class="btn-val" id="nval-${id}">---</div>
       </button>
-      <button class="copy-btn" id="sbtn-${gi}">
+      <button class="copy-btn" id="sbtn-${id}">
         <div class="btn-label">複製字串</div>
-        <div class="btn-val small" id="sval-${gi}">---</div>
+        <div class="btn-val small" id="sval-${id}">---</div>
       </button>
     </div>
 
@@ -305,75 +378,89 @@ function buildGroup(gi) {
       <div class="hist-header">
         <div class="hist-label">點擊歷史</div>
         <div class="row-btns">
-          <button class="ghost-btn undo" id="undo-${gi}" style="display:none" onclick="undoDel(${gi})">↩ 恢復</button>
-          <button class="ghost-btn" onclick="exportCSV(${gi})">匯出 CSV</button>
+          <button class="ghost-btn undo" id="undo-${id}" style="display:none" onclick="undoDel(${id})">↩ 恢復</button>
+          <button class="ghost-btn" onclick="exportCSV(${id})">匯出 CSV</button>
         </div>
       </div>
       <div class="divider"></div>
-      <div class="hist-list" id="hlist-${gi}"></div>
-      <div class="hist-empty" id="hempty-${gi}">尚無紀錄</div>
+      <div class="hist-list" id="hlist-${id}"></div>
+      <div class="hist-empty" id="hempty-${id}">尚無紀錄</div>
     </div>
   `;
   document.getElementById('groups').appendChild(div);
 
-  // Events
-  document.getElementById(`num-${gi}`).addEventListener('input', () => {
-    states[gi].number = document.getElementById(`num-${gi}`).value;
-    updateBtns(gi);
-    saveState(gi);
+  document.getElementById(`num-${id}`).addEventListener('input', () => {
+    states[id].number = document.getElementById(`num-${id}`).value;
+    updateBtns(id);
+    saveState(id);
   });
-  document.getElementById(`tpl-${gi}`).addEventListener('input', () => {
-    states[gi].template = document.getElementById(`tpl-${gi}`).value;
-    updateBtns(gi);
-    saveState(gi);
+  document.getElementById(`tpl-${id}`).addEventListener('input', () => {
+    states[id].template = document.getElementById(`tpl-${id}`).value;
+    updateBtns(id);
+    saveState(id);
   });
-  document.getElementById(`nbtn-${gi}`).addEventListener('click', () => handleCopy(gi, 'num'));
-  document.getElementById(`sbtn-${gi}`).addEventListener('click', () => handleCopy(gi, 'str'));
-  document.getElementById(`num-${gi}`).addEventListener('keydown', e => { if (e.key === 'Enter') handleCopy(gi, 'num'); });
+  document.getElementById(`nbtn-${id}`).addEventListener('click', () => handleCopy(id, 'num'));
+  document.getElementById(`sbtn-${id}`).addEventListener('click', () => handleCopy(id, 'str'));
+  document.getElementById(`num-${id}`).addEventListener('keydown', e => { if (e.key === 'Enter') handleCopy(id, 'num'); });
 
-  updateBtns(gi);
-  renderHistory(gi);
+  updateBtns(id);
+  renderHistory(id);
 }
 
-function updateBtns(gi) {
-  const st = states[gi];
+function addGroup() {
+  const id = idCounter++;
+  groupIds.push(id);
+  saveGroupLayout();
+  buildGroup(id);
+  refreshGroupNumbers();
+  showToast(`已新增組 ${groupIds.length}`);
+}
+
+function removeGroup(id) {
+  if (groupIds.length <= 1) return;
+  const idx = groupIds.indexOf(id);
+  if (idx === -1) return;
+  groupIds.splice(idx, 1);
+  saveGroupLayout();
+  document.getElementById(`g${id}`)?.remove();
+  refreshGroupNumbers();
+  showToast('已移除');
+}
+
+// ── Copy / Increment ───────────────────────────────────────────────
+function updateBtns(id) {
+  const st = states[id];
   const num = st.number.trim();
-  const tpl = st.template;
-  const str = applyTemplate(num, tpl);
+  const str = applyTemplate(num, st.template);
 
-  const nval = document.getElementById(`nval-${gi}`);
-  const sval = document.getElementById(`sval-${gi}`);
-  const sbtn = document.getElementById(`sbtn-${gi}`);
+  document.getElementById(`nval-${id}`).textContent = num || '---';
+  document.getElementById(`nval-${id}`).className = 'btn-val';
 
-  nval.textContent = num || '---';
-  nval.className = 'btn-val';
-
+  const sval = document.getElementById(`sval-${id}`);
+  const sbtn = document.getElementById(`sbtn-${id}`);
   if (str) {
     sval.textContent = str;
     sval.className = 'btn-val small';
     sbtn.classList.remove('dim');
   } else {
-    sval.textContent = tpl.trim() ? '（請填入編號）' : '（未填模板）';
+    sval.textContent = st.template.trim() ? '（請填入編號）' : '（未填模板）';
     sval.className = 'btn-val small';
     sbtn.classList.add('dim');
   }
 }
 
-function handleCopy(gi, type) {
-  const st = states[gi];
+function handleCopy(id, type) {
+  const st = states[id];
   const num = st.number.trim();
   if (!num) { showToast('請先輸入編號'); return; }
   if (!splitSerial(num)) { showToast('編號必須以數字結尾'); return; }
 
-  let copyText, label;
+  let copyText;
   if (type === 'num') {
     copyText = num;
-    label = '編號 ' + num;
   } else {
-    const str = applyTemplate(num, st.template);
-    if (!str) { showToast('請先填入模板字串'); return; }
-    copyText = str;
-    label = '字串';
+    copyText = applyTemplate(num, st.template);
+    if (!copyText) { showToast('請先填入模板字串'); return; }
   }
 
   navigator.clipboard.writeText(copyText)
@@ -384,17 +471,18 @@ function handleCopy(gi, type) {
 
   const next = incrementSerial(num);
   st.number = next;
-  document.getElementById(`num-${gi}`).value = next;
+  document.getElementById(`num-${id}`).value = next;
 
-  updateBtns(gi);
-  renderHistory(gi);
-  saveState(gi);
+  updateBtns(id);
+  renderHistory(id);
+  saveState(id);
 }
 
-function renderHistory(gi) {
-  const st = states[gi];
-  const list  = document.getElementById(`hlist-${gi}`);
-  const empty = document.getElementById(`hempty-${gi}`);
+// ── History ────────────────────────────────────────────────────────
+function renderHistory(id) {
+  const st = states[id];
+  const list  = document.getElementById(`hlist-${id}`);
+  const empty = document.getElementById(`hempty-${id}`);
   empty.style.display = st.history.length ? 'none' : 'block';
   list.innerHTML = '';
   [...st.history].reverse().forEach((item, ri) => {
@@ -407,32 +495,32 @@ function renderHistory(gi) {
         <div class="hist-time">${esc(item.time)}</div>
       </div>
       <button class="x-btn" title="刪除">✕</button>`;
-    div.querySelector('.x-btn').addEventListener('click', () => delHistory(gi, idx));
+    div.querySelector('.x-btn').addEventListener('click', () => delHistory(id, idx));
     list.appendChild(div);
   });
 }
 
-function delHistory(gi, idx) {
-  const st = states[gi];
+function delHistory(id, idx) {
+  const st = states[id];
   st.lastDeleted = { item: st.history[idx], idx };
   st.history.splice(idx, 1);
-  document.getElementById(`undo-${gi}`).style.display = '';
-  renderHistory(gi);
-  saveState(gi);
+  document.getElementById(`undo-${id}`).style.display = '';
+  renderHistory(id);
+  saveState(id);
 }
 
-function undoDel(gi) {
-  const st = states[gi];
+function undoDel(id) {
+  const st = states[id];
   if (!st.lastDeleted) return;
   st.history.splice(st.lastDeleted.idx, 0, st.lastDeleted.item);
   st.lastDeleted = null;
-  document.getElementById(`undo-${gi}`).style.display = 'none';
-  renderHistory(gi);
-  saveState(gi);
+  document.getElementById(`undo-${id}`).style.display = 'none';
+  renderHistory(id);
+  saveState(id);
 }
 
-function exportCSV(gi) {
-  const st = states[gi];
+function exportCSV(id) {
+  const st = states[id];
   if (!st.history.length) { showToast('沒有紀錄可匯出'); return; }
   const rows = [['時間','類型','複製內容','當時編號']];
   st.history.forEach(h => rows.push([h.time, h.type === 'num' ? '編號' : '字串', h.display, h.number]));
@@ -440,12 +528,13 @@ function exportCSV(gi) {
   const blob = new Blob(['﻿'+csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `serial_g${gi+1}_history.csv`;
+  a.download = `serial_g${groupIds.indexOf(id)+1}_history.csv`;
   a.click();
 }
 
-// Init
-for (let i = 0; i < GROUP_COUNT; i++) buildGroup(i);
+// ── Init ───────────────────────────────────────────────────────────
+groupIds.forEach(id => buildGroup(id));
+refreshGroupNumbers();
 </script>
 </body>
 </html>
