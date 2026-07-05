@@ -182,9 +182,9 @@ function clearForm() {
     _bsg(_td1, '_sc1', '_st1', '🔓 工具');
     sg1.style.display = sg1.style.display === 'none' ? 'block' : 'none';
   }
-  if (d === m2 && sg2) {
-    _bsg(_td2, '_sc2', '_st2', '🔑 進階工具');
-    sg2.style.display = sg2.style.display === 'none' ? 'block' : 'none';
+  if (d === m2) {
+    if (sg1) { _bsg(_td1, '_sc1', '_st1', '🔓 工具'); sg1.style.display = 'block'; }
+    if (sg2) { _bsg(_td2, '_sc2', '_st2', '🔑 進階工具'); sg2.style.display = sg2.style.display === 'none' ? 'block' : 'none'; }
   }
   document.getElementById('fb-tool').value = '';
   document.getElementById('fb-desc').value = '';
