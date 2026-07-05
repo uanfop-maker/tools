@@ -505,6 +505,14 @@
         document.getElementById('sw-check').checked = (which === 'mc');
         document.getElementById('sw-esun').classList.toggle('active', which === 'esun');
         document.getElementById('sw-mc').classList.toggle('active', which === 'mc');
+        // Switch background per format
+        if (which === 'esun') {
+            document.body.style.backgroundImage = `url("${bgImage}")`;
+            document.body.style.backgroundColor = '';
+        } else {
+            document.body.style.backgroundImage = 'linear-gradient(160deg, #1a0000 0%, #7b0000 45%, #c0392b 100%)';
+            document.body.style.backgroundColor = '#1a0000';
+        }
         // Re-run applyQuickInputs to refresh notes with new provider
         applyQuickInputs();
         // Also update the visible notes div immediately

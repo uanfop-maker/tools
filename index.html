@@ -50,7 +50,7 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
 <div class="grid">
   <a class="card" href="serial.html">
     <div class="card-top"><div class="icon">🔢</div><div class="name">流水編號產生器</div></div>
-    <div class="desc">設定初始編號，按鈕一鍵複製並自動 +1。支援英數混合（如 AA090801），三組獨立編號，可套用模板字串、匯出 CSV 歷史。</div>
+    <div class="desc">設定初始編號，按鈕一鍵複製並自動 +1。支援英數混合（如 AA090801），可自行增減組數（最少 1 組），可套用模板字串、匯出 CSV 歷史。</div>
     <span class="badge">本地運算</span>
   </a>
   <a class="card" href="2fa.html">
@@ -70,8 +70,13 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
   </a>
   <a class="card" href="gs1_t9.html">
     <div class="card-top"><div class="icon">🏦</div><div class="name">GS1 電子帳單產生器</div></div>
-    <div class="desc">7-11 超商繳費電子帳單模擬器，支援玉山 / MC（智冠）兩種格式切換，一鍵截圖：手機自動用分享功能，桌機複製到剪貼簿。</div>
+    <div class="desc">7-11 超商繳費電子帳單模擬器，支援玉山 / MC（智冠）兩種格式切換（各自背景），一鍵截圖：手機自動用分享功能，桌機複製到剪貼簿。</div>
     <span class="badge">本地運算</span>
+  </a>
+  <a class="card" href="grok-history-scroll.html">
+    <div class="card-top"><div class="icon">📜</div><div class="name">Grok 歷史無限滾動</div></div>
+    <div class="desc">讓 Grok 對話歷史列表可以無限往下滾，自動載入所有紀錄。安裝說明 + 下載頁面。</div>
+    <span class="badge">瀏覽器擴充</span>
   </a>
 </div>
 
@@ -88,6 +93,7 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
       <option value="MP4 / MOV 批量轉 GIF">MP4 / MOV 批量轉 GIF</option>
       <option value="影片轉 LINE MP4">影片轉 LINE MP4</option>
       <option value="GS1 電子帳單產生器">GS1 電子帳單產生器</option>
+      <option value="Grok 歷史無限滾動">Grok 歷史無限滾動</option>
     </select>
   </div>
   <div class="field">
