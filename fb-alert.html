@@ -165,6 +165,48 @@ h1 {
 audio::-webkit-media-controls-panel { background: #1a2a40; }
 audio::-webkit-media-controls-current-time-display,
 audio::-webkit-media-controls-time-remaining-display { color: #c9a84c; }
+details.history {
+  background: #0e1828;
+  border: 1px solid #c9a84c22;
+  border-radius: 10px;
+  padding: 0;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+details.history summary {
+  cursor: pointer;
+  padding: 13px 16px;
+  font-size: 0.82rem;
+  color: #c9a84c88;
+  letter-spacing: 0.06em;
+  list-style: none;
+  user-select: none;
+  transition: color 0.15s;
+}
+details.history summary::-webkit-details-marker { display: none; }
+details.history summary::before { content: '▸ '; }
+details.history[open] summary::before { content: '▾ '; }
+details.history summary:hover { color: #c9a84c; }
+.history-list {
+  border-top: 1px solid #c9a84c1a;
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.history-list .hv {
+  font-size: 0.82rem;
+  color: #7788aa;
+  line-height: 1.5;
+}
+.history-list .hv a {
+  color: #c9a84c99;
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 6px;
+  transition: color 0.15s;
+}
+.history-list .hv a:hover { color: #c9a84c; }
 </style>
 </head>
 <body>
@@ -199,6 +241,30 @@ audio::-webkit-media-controls-time-remaining-display { color: #c9a84c; }
     ⬇ 下載穩定版 v4.6
     <span class="st-sub">fb-messenger-alert-v4.6.zip · 功能完整、穩定運作版本</span>
   </a>
+
+  <details class="history">
+    <summary>歷史版本（v1 ~ v4.8.4）</summary>
+    <div class="history-list">
+      <div class="hv"><a href="fb-messenger-alert-v4.8.4.zip" download>⬇ v4.8.4</a> — URL guard：非 inbox/messenger 頁面直接 return，避免在無關頁面執行</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.8.3.zip" download>⬇ v4.8.3</a> — 音效移回 content.js（用 new Audio() 在頁面直接播放），捨棄 offscreen document</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.8.2.zip" download>⬇ v4.8.2</a> — dedup 修復：改用 dataUtime 時間戳為去重 key（避免相同發訊者多次觸發），加入 init guard 與 safeCall 包裝</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.8.0.zip" download>⬇ v4.8.0</a> — 版本號提升（程式碼與 v4.7.9 相同，正式標記為 4.8 系列，offscreen audio 架構）</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.7.9.zip" download>⬇ v4.7.9</a> — 程式碼與 v4.7.8 相同，版本號遞增測試用</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.7.8.zip" download>⬇ v4.7.8</a> — targeted try-catch：只對 Extension context 錯誤觸發 killScript()，其他錯誤靜默忽略讓下次 timer 繼續</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.7.7.zip" download>⬇ v4.7.7</a> — 雙層防護：port disconnect（主動）+ 每個 async callback 全面 try-catch（被動），清除 _cfg 釋放舊 reference</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.7.6.zip" download>⬇ v4.7.6</a> — 改用 port.onDisconnect 主動偵測 extension reload，在 chrome API 呼叫失敗前就關閉計時器與 observer</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.7.5.zip" download>⬇ v4.7.5</a> — title-watch 掃描所有可見未讀 thread（非僅第一筆），加入 sender|text 共用 dedup Map 防止 title-watch 與 DOM scan 雙重觸發</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.7.3.zip" download>⬇ v4.7.3</a> — 標題監聽（title-watch）+ DOM scan 雙模式混合；在 window error listener 全域抑制 Extension context invalidated 錯誤</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.6.zip" download>⬇ v4.6</a> — 加入 isAlive() / safeSend() context 守衛，所有 chrome API 呼叫前先確認 extension 存活（最後穩定版）</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.5.zip" download>⬇ v4.5</a> — 修復 thread_row wrapper 定位邏輯（從 titleEl 向上找 row 容器），改善頁名從全部 data-surface 元素搜尋</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.0.zip" download>⬇ v4.0</a> — 全面重寫：純 DOM-based per-thread 偵測，threadState 追蹤每列狀態，移除 injector.js 架構</div>
+      <div class="hv"><a href="fb-messenger-alert-v3.2.zip" download>⬇ v3.2</a> — injector 改用 data-surface 抓頁名（取代解析 inline script），移除 content.js 時間冷卻（改由 injector 以 message ID 去重）</div>
+      <div class="hv"><a href="fb-messenger-alert-v3.1.zip" download>⬇ v3.1</a> — 分離架構：content.js 改為 isolated world，injector.js 在 main world 攔截 fetch/XHR，透過 CustomEvent 傳遞訊息</div>
+      <div class="hv"><a href="fb-messenger-alert-v3.zip" download>⬇ v3</a> — 三管齊下偵測：fetch/XHR/WebSocket 攔截 + DOM badge 輪詢 + title 監聽；改用 seenIds Set 去重</div>
+      <div class="hv"><a href="fb-messenger-alert-v2.zip" download>⬇ v2</a> — 改用 document.title 變化 + XHR 攔截偵測，加入 AudioContext unlock 解決 Chrome 自動播放限制</div>
+      <div class="hv"><a href="fb-messenger-alert-v1.zip" download>⬇ v1</a> — 初始版本：DOM MutationObserver 輪詢，Web Audio API 生成 beep 音效，Telegram 通知</div>
+    </div>
+  </details>
 
   <div class="section">
     <div class="section-title">試聽音效</div>
