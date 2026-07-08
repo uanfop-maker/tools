@@ -216,7 +216,7 @@ details.history summary:hover { color: #c9a84c; }
   <div class="header">
     <div class="icon">📨</div>
     <h1>FB Messenger 私訊提醒</h1>
-    <span class="ver">v4.8.6</span>
+    <span class="ver">v4.8.7</span>
     <p class="subtitle">Chrome 插件 — 自動偵測 FB Business Suite 未讀私訊，<br>播放音效並發送 Telegram 通知</p>
   </div>
 
@@ -232,9 +232,9 @@ details.history summary:hover { color: #c9a84c; }
     </ul>
   </div>
 
-  <a class="download-btn" href="fb-messenger-alert-v4.8.6.zip" download>
-    ⬇ 下載最新版 v4.8.6
-    <span class="dl-sub">fb-messenger-alert-v4.8.6.zip · 修復 TG 通知中斷 + 音效 + Extension context 錯誤</span>
+  <a class="download-btn" href="fb-messenger-alert-v4.8.7.zip" download>
+    ⬇ 下載最新版 v4.8.7
+    <span class="dl-sub">fb-messenger-alert-v4.8.7.zip · 恢復原始音效（v4.6 振盪器音效）+ 修復 TG/context 問題</span>
   </a>
 
   <a class="download-stable" href="fb-messenger-alert-v4.6.zip" download>
@@ -243,8 +243,10 @@ details.history summary:hover { color: #c9a84c; }
   </a>
 
   <details class="history">
-    <summary>歷史版本（v1 ~ v4.8.4）</summary>
+    <summary>歷史版本（v1 ~ v4.8.6）</summary>
     <div class="history-list">
+      <div class="hv"><a href="fb-messenger-alert-v4.8.6.zip" download>⬇ v4.8.6</a> — 修復 port.onDisconnect 誤殺 content script（SW 休眠斷線不再觸發 killScript）</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.8.5.zip" download>⬇ v4.8.5</a> — 全域錯誤攔截（global backstop）+ alive() 改用 chrome.runtime.id 即時判斷</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.4.zip" download>⬇ v4.8.4</a> — URL guard：非 inbox/messenger 頁面直接 return，避免在無關頁面執行</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.3.zip" download>⬇ v4.8.3</a> — 音效移回 content.js（用 new Audio() 在頁面直接播放），捨棄 offscreen document</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.2.zip" download>⬇ v4.8.2</a> — dedup 修復：改用 dataUtime 時間戳為去重 key（避免相同發訊者多次觸發），加入 init guard 與 safeCall 包裝</div>
