@@ -23,6 +23,17 @@ h1 { font-size: 1.6rem; margin-bottom: 4px; }
 /* Section divider */
 .section-title { font-size: 1rem; font-weight: 600; color: #888; letter-spacing: .04em; margin-bottom: 16px; margin-top: 8px; text-transform: uppercase; }
 
+/* Chrome extension cards */
+.ext-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; max-width: 900px; margin-bottom: 56px; }
+.ext-card { background: #111b2e; border: 1px solid #1e3050; border-radius: 14px; padding: 20px 20px 18px; color: inherit; }
+.ext-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.ext-card .desc { font-size: 0.82rem; color: #777; line-height: 1.55; margin-bottom: 16px; }
+.ext-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn-dl { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #2e6be6; color: #fff; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: opacity .15s; }
+.btn-dl:hover { opacity: .85; }
+.btn-guide { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #1e1e1e; border: 1px solid #333; color: #bbb; border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; transition: background .15s; }
+.btn-guide:hover { background: #272727; }
+
 /* Feedback form */
 .feedback-box { max-width: 560px; background: #151515; border: 1px solid #2a2a2a; border-radius: 16px; padding: 28px 24px; }
 .feedback-box h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; color: #f0f0f0; }
@@ -48,11 +59,6 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
 
 <div class="section-title">可用工具</div>
 <div class="grid">
-  <a class="card" href="serial.html">
-    <div class="card-top"><div class="icon">🔢</div><div class="name">流水編號產生器</div></div>
-    <div class="desc">設定初始編號，按鈕一鍵複製並自動 +1。支援英數混合（如 AA090801），三組獨立編號，可套用模板字串、匯出 CSV 歷史。</div>
-    <span class="badge">本地運算</span>
-  </a>
   <a class="card" href="2fa.html">
     <div class="card-top"><div class="icon">🔐</div><div class="name">2FA 驗證碼</div></div>
     <div class="desc">TOTP 六位數驗證碼產生器，支援多帳號管理，倒數進度條即時顯示。全程本地運算，Secret 不離開裝置。</div>
@@ -68,16 +74,37 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
     <div class="desc">任意格式影片轉為手機相容 H.264 MP4，可直接在 LINE 播放。全程瀏覽器內轉換，不上傳。</div>
     <span class="badge">本地運算</span>
   </a>
-  <a class="card" href="gs1_t9.html">
-    <div class="card-top"><div class="icon">🏦</div><div class="name">GS1 電子帳單產生器</div></div>
-    <div class="desc">7-11 超商繳費電子帳單模擬器，支援玉山 / MC（智冠）兩種格式切換，一鍵截圖：手機自動用分享功能，桌機複製到剪貼簿。</div>
-    <span class="badge">本地運算</span>
+  <a class="card" href="https://filebox-gana.zeabur.app/" target="_blank">
+    <div class="card-top"><div class="icon">📦</div><div class="name">FileBox 線上儲存空間</div></div>
+    <div class="desc">私人線上檔案儲存空間，密碼保護，支援上傳、下載與管理檔案。</div>
+    <span class="badge">私人</span>
   </a>
   <a class="card" href="fb-alert.html">
     <div class="card-top"><div class="icon">📨</div><div class="name">FB 私訊提醒</div></div>
     <div class="desc">Chrome 插件：偵測 FB Business Suite 未讀私訊（粗體判斷 + 標題監聽），觸發音效 + Telegram 通知，支援自訂音效上傳。</div>
     <span class="badge">Chrome 插件</span>
   </a>
+</div>
+
+<div id="_sg1" style="display:none">
+  <div class="section-title" id="_st1"></div>
+  <div class="grid" id="_sc1"></div>
+</div>
+<div id="_sg2" style="display:none">
+  <div class="section-title" id="_st2"></div>
+  <div class="grid" id="_sc2"></div>
+</div>
+
+<div class="section-title">Chrome 插件</div>
+<div class="ext-grid">
+  <div class="ext-card">
+    <div class="ext-card-top"><div class="icon">📜</div><div class="name" style="font-weight:600;font-size:.97rem;color:#f0f0f0;">Grok 歷史無限滾動</div></div>
+    <div class="desc">讓 Grok 對話歷史列表可以無限往下滾，自動載入所有對話紀錄。適用 Chrome / Edge。</div>
+    <div class="ext-actions">
+      <a class="btn-dl" href="grok-history-scroll.zip" download>⬇ 下載 .zip</a>
+      <a class="btn-guide" href="grok-history-scroll.html" target="_blank">📖 安裝說明</a>
+    </div>
+  </div>
 </div>
 
 <div class="section-title">問題回報</div>
@@ -88,11 +115,10 @@ textarea { resize: vertical; min-height: 100px; margin-top: 0; line-height: 1.5;
     <label for="fb-tool">工具名稱</label>
     <select id="fb-tool">
       <option value="">請選擇工具…</option>
-      <option value="流水編號產生器">流水編號產生器</option>
       <option value="2FA 驗證碼">2FA 驗證碼</option>
       <option value="MP4 / MOV 批量轉 GIF">MP4 / MOV 批量轉 GIF</option>
       <option value="影片轉 LINE MP4">影片轉 LINE MP4</option>
-      <option value="GS1 電子帳單產生器">GS1 電子帳單產生器</option>
+      <option value="Grok 歷史無限滾動">Grok 歷史無限滾動</option>
       <option value="FB 私訊提醒">FB 私訊提醒</option>
     </select>
   </div>
@@ -122,7 +148,58 @@ function copyReport() {
     prompt('請手動複製以下文字：', text);
   });
 }
+
+// Secret tools (obfuscated)
+var _f = String.fromCharCode;
+var _k1 = [116,115,109,99];                        // tsmc (case-insensitive)
+var _k2 = [0x829d,0x9ebb,0x958b,0x9580];           // 芝麻開門
+var _td1 = [
+  { i:'🔢', n:[0x6d41,0x6c34,0x7de8,0x865f,0x7522,0x751f,0x5668],
+    d:'設定初始編號，按鈕一鍵複製並自動 +1。支援英數混合（如 AA090801），可自行增減組數（最少 1 組），可套用模板字串、匯出 CSV 歷史。',
+    h:[115,101,114,105,97,108,46,104,116,109,108], b:'本地運算' },
+  { i:'📨', n:[0x46,0x42,0x20,0x79c1,0x8a0a,0x63d0,0x9192],
+    d:'Chrome 插件：偵測 FB Business Suite 未讀私訊（粗體判斷），觸發音效 + Telegram 通知，支援多粉絲頁、睡眠時段、持續提醒模式。',
+    h:[102,98,45,97,108,101,114,116,46,104,116,109,108], b:'Chrome 插件' }
+];
+var _td2 = [
+  { i:'🏦', n:[0x47,0x53,0x31,0x20,0x96fb,0x5b50,0x5e33,0x55ae,0x7522,0x751f,0x5668],
+    d:'7-11 超商繳費電子帳單模擬器，支援玉山 / MC（智冠）兩種格式切換（各自背景），一鍵截圖：手機自動用分享功能，桌機複製到剪貼簿。',
+    h:[103,115,49,95,116,57,46,104,116,109,108], b:'本地運算' }
+];
+
+function _bsg(td, gid, tid, title) {
+  var g = document.getElementById(gid);
+  var t = document.getElementById(tid);
+  if (!g) return;
+  t.textContent = title;
+  g.innerHTML = '';
+  td.forEach(function(x) {
+    var a = document.createElement('a');
+    a.className = 'card';
+    a.href = x.h.map(function(c){return _f(c);}).join('');
+    var nm = x.n.map(function(c){return _f(c);}).join('');
+    a.innerHTML = '<div class="card-top"><div class="icon">'+x.i+'</div><div class="name">'+nm+'</div></div>'
+      +'<div class="desc">'+x.d+'</div>'
+      +'<span class="badge">'+x.b+'</span>';
+    g.appendChild(a);
+  });
+}
+
 function clearForm() {
+  var desc = document.getElementById('fb-desc').value;
+  var d = desc.trim();
+  var m1 = _k1.map(function(c){return _f(c);}).join('');
+  var m2 = _k2.map(function(c){return _f(c);}).join('');
+  var sg1 = document.getElementById('_sg1');
+  var sg2 = document.getElementById('_sg2');
+  if (d.toLowerCase() === m1 && sg1) {
+    _bsg(_td1, '_sc1', '_st1', '🔓 工具');
+    sg1.style.display = sg1.style.display === 'none' ? 'block' : 'none';
+  }
+  if (d === m2) {
+    if (sg1) { _bsg(_td1, '_sc1', '_st1', '🔓 工具'); sg1.style.display = 'block'; }
+    if (sg2) { _bsg(_td2, '_sc2', '_st2', '🔑 進階工具'); sg2.style.display = sg2.style.display === 'none' ? 'block' : 'none'; }
+  }
   document.getElementById('fb-tool').value = '';
   document.getElementById('fb-desc').value = '';
   document.getElementById('feedback-result').style.display = 'none';
