@@ -216,7 +216,7 @@ details.history summary:hover { color: #c9a84c; }
   <div class="header">
     <div class="icon">📨</div>
     <h1>FB Messenger 私訊提醒</h1>
-    <span class="ver">v4.8.8</span>
+    <span class="ver">v4.8.9</span>
     <p class="subtitle">Chrome 插件 — 自動偵測 FB Business Suite 未讀私訊，<br>播放音效並發送 Telegram 通知</p>
   </div>
 
@@ -232,19 +232,20 @@ details.history summary:hover { color: #c9a84c; }
     </ul>
   </div>
 
-  <a class="download-btn" href="fb-messenger-alert-v4.8.8.zip" download>
-    ⬇ 下載最新版 v4.8.8
-    <span class="dl-sub">fb-messenger-alert-v4.8.8.zip · 修復 SPA 跳頁後 content script 無限錯誤 loop</span>
+  <a class="download-btn" href="fb-messenger-alert-v4.8.9.zip" download>
+    ⬇ 下載最新版 v4.8.9
+    <span class="dl-sub">fb-messenger-alert-v4.8.9.zip · SW keepalive 防止休眠 + port 自動重連 + 修復音效與 TG 重複通知</span>
   </a>
 
-  <a class="download-stable" href="fb-messenger-alert-v4.6.zip" download>
-    ⬇ 下載穩定版 v4.6
-    <span class="st-sub">fb-messenger-alert-v4.6.zip · 功能完整、穩定運作版本</span>
+  <a class="download-stable" href="fb-messenger-alert-v4.8.8.zip" download>
+    ⬇ 下載穩定版 v4.8.8
+    <span class="st-sub">fb-messenger-alert-v4.8.8.zip · 修復 SPA 跳頁後無限錯誤 loop，功能穩定</span>
   </a>
 
   <details class="history">
-    <summary>歷史版本（v1 ~ v4.8.7）</summary>
+    <summary>歷史版本（v1 ~ v4.8.8）</summary>
     <div class="history-list">
+      <div class="hv"><a href="fb-messenger-alert-v4.8.8.zip" download>⬇ v4.8.8</a> ⭐ 穩定版 — 修復 SPA 跳頁後 content script 無限錯誤 loop（onValidPage 返回 return 而非 kill）</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.7.zip" download>⬇ v4.8.7</a> — 恢復原始音效（v4.6 Web Audio 振盪器 880→1100→880Hz）作為選項 1</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.6.zip" download>⬇ v4.8.6</a> — 修復 port.onDisconnect 誤殺 content script（SW 休眠斷線不再觸發 killScript）</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.5.zip" download>⬇ v4.8.5</a> — 全域錯誤攔截（global backstop）+ alive() 改用 chrome.runtime.id 即時判斷</div>
@@ -258,7 +259,7 @@ details.history summary:hover { color: #c9a84c; }
       <div class="hv"><a href="fb-messenger-alert-v4.7.6.zip" download>⬇ v4.7.6</a> — 改用 port.onDisconnect 主動偵測 extension reload，在 chrome API 呼叫失敗前就關閉計時器與 observer</div>
       <div class="hv"><a href="fb-messenger-alert-v4.7.5.zip" download>⬇ v4.7.5</a> — title-watch 掃描所有可見未讀 thread（非僅第一筆），加入 sender|text 共用 dedup Map 防止 title-watch 與 DOM scan 雙重觸發</div>
       <div class="hv"><a href="fb-messenger-alert-v4.7.3.zip" download>⬇ v4.7.3</a> — 標題監聽（title-watch）+ DOM scan 雙模式混合；在 window error listener 全域抑制 Extension context invalidated 錯誤</div>
-      <div class="hv"><a href="fb-messenger-alert-v4.6.zip" download>⬇ v4.6</a> — 加入 isAlive() / safeSend() context 守衛，所有 chrome API 呼叫前先確認 extension 存活（最後穩定版）</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.6.zip" download>⬇ v4.6</a> ⭐ 穩定版 — 加入 isAlive() / safeSend() context 守衛，所有 chrome API 呼叫前先確認 extension 存活</div>
       <div class="hv"><a href="fb-messenger-alert-v4.5.zip" download>⬇ v4.5</a> — 修復 thread_row wrapper 定位邏輯（從 titleEl 向上找 row 容器），改善頁名從全部 data-surface 元素搜尋</div>
       <div class="hv"><a href="fb-messenger-alert-v4.0.zip" download>⬇ v4.0</a> — 全面重寫：純 DOM-based per-thread 偵測，threadState 追蹤每列狀態，移除 injector.js 架構</div>
       <div class="hv"><a href="fb-messenger-alert-v3.2.zip" download>⬇ v3.2</a> — injector 改用 data-surface 抓頁名（取代解析 inline script），移除 content.js 時間冷卻（改由 injector 以 message ID 去重）</div>
