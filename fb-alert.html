@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FB Messenger 提醒插件</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0b1220;
+  color: #e8dcc8;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+.container { max-width: 680px; margin: 0 auto; }
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #c9a84c2a;
+}
+.icon { font-size: 3rem; margin-bottom: 12px; }
+h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #c9a84c;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.ver {
+  display: inline-block;
+  background: #c9a84c22;
+  border: 1px solid #c9a84c44;
+  border-radius: 20px;
+  color: #c9a84caa;
+  font-size: 0.75rem;
+  padding: 3px 14px;
+  letter-spacing: 0.08em;
+}
+.subtitle {
+  font-size: 0.95rem;
+  color: #8899aa;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+.section { margin-bottom: 28px; }
+.section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #c9a84c;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #c9a84c18;
+}
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.feature-list li {
+  background: #111c30;
+  border: 1px solid #c9a84c18;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.feature-list li .fi { flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+.steps { counter-reset: step; display: flex; flex-direction: column; gap: 10px; }
+.step {
+  background: #111c30;
+  border: 1px solid #c9a84c18;
+  border-radius: 10px;
+  padding: 14px 16px 14px 50px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  position: relative;
+  color: #ccbbaa;
+}
+.step::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  background: #c9a84c22;
+  border: 1px solid #c9a84c44;
+  border-radius: 50%;
+  color: #c9a84c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+}
+.step code {
+  background: #0b1220;
+  border: 1px solid #c9a84c33;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.82rem;
+  color: #c9a84c;
+}
+.download-btn {
+  display: block;
+  background: linear-gradient(135deg, #a87828, #d4af37);
+  color: #0b1220;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-decoration: none;
+  padding: 16px;
+  border-radius: 14px;
+  margin: 24px 0;
+  box-shadow: 0 4px 20px #c9a84c28;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.download-btn:hover { opacity: 0.9; }
+.download-btn:active { transform: scale(0.98); }
+.download-btn .dl-sub { font-size: 0.7rem; font-weight: 600; opacity: 0.7; display: block; margin-top: 3px; letter-spacing: 0.04em; }
+.note {
+  background: #1a1020;
+  border: 1px solid #9966ff33;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 0.82rem;
+  color: #aa99bb;
+  line-height: 1.6;
+}
+.note strong { color: #bb99dd; }
+.back {
+  display: inline-block;
+  color: #c9a84c66;
+  font-size: 0.8rem;
+  text-decoration: none;
+  margin-bottom: 28px;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.back:hover { color: #c9a84c; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="/">← 返回工具列表</a>
+
+  <div class="header">
+    <div class="icon">📨</div>
+    <h1>FB Messenger 私訊提醒</h1>
+    <span class="ver">v4.7.6</span>
+    <p class="subtitle">Chrome 插件 — 自動偵測 FB Business Suite 未讀私訊，<br>播放音效並發送 Telegram 通知</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">功能特色</div>
+    <ul class="feature-list">
+      <li><span class="fi">🔍</span>DOM 粗體偵測：只有「真正未讀」（粗體）的訊息才觸發提醒，已讀訊息不會重複通知</li>
+      <li><span class="fi">📜</span>標題監聽：監聽瀏覽器標題列未讀數字，即使對話清單未捲動到也能即時觸發</li>
+      <li><span class="fi">📲</span>Telegram 通知：自動發送「粉絲頁名稱 / 發訊者 / 訊息預覽 / 連結」到指定群組或私訊</li>
+      <li><span class="fi">🔔</span>音效模式：關閉 / 單次 / 持續（可設定間隔秒數）；支援自訂音效上傳</li>
+      <li><span class="fi">🌙</span>睡眠時段：設定靜音時間段，期間只發 TG、不播音效</li>
+      <li><span class="fi">🏪</span>多粉絲頁支援：自動識別粉絲頁名稱，不依賴 URL</li>
+    </ul>
+  </div>
+
+  <a class="download-btn" href="fb-messenger-alert-v4.7.6.zip" download>
+    ⬇ 下載 FB Messenger 提醒插件
+    <span class="dl-sub">fb-messenger-alert-v4.7.6.zip · Chrome Extension MV3</span>
+  </a>
+
+  <div class="section">
+    <div class="section-title">安裝方式</div>
+    <div class="steps">
+      <div class="step">解壓縮下載的 <code>.zip</code> 檔案到任意資料夾</div>
+      <div class="step">開啟 Chrome，網址列輸入 <code>chrome://extensions</code></div>
+      <div class="step">右上角開啟「開發人員模式」</div>
+      <div class="step">點「載入未封裝項目」，選擇剛才解壓縮的資料夾</div>
+      <div class="step">插件安裝完成後，前往 <code>business.facebook.com</code> 的 Inbox 頁面</div>
+      <div class="step">點插件圖示，設定 Telegram Bot Token、Chat ID（選填 Thread ID），儲存設定</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>注意：</strong>此插件需在 <code>business.facebook.com/latest/inbox</code> 頁面執行，且需保持該頁面開著。插件每 2 秒掃描一次 DOM，偵測新的未讀訊息（粗體）才觸發通知，避免重複提醒。
+  </div>
+</div>
+</body>
+</html>
