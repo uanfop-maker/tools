@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>廣告收益報告 7/2–7/9</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif;
+  background: #0a0e1a;
+  color: #e0e6f0;
+  min-height: 100vh;
+  padding: 32px 20px 48px;
+}
+.container { max-width: 860px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 36px; }
+.header h1 { font-size: 1.5rem; font-weight: 700; color: #fff; letter-spacing: .04em; margin-bottom: 6px; }
+.header .period { font-size: 0.82rem; color: #556; letter-spacing: .06em; }
+.kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.kpi {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 18px 20px;
+  text-align: center;
+}
+.kpi .label { font-size: 0.72rem; color: #4a6080; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+.kpi .value { font-size: 1.5rem; font-weight: 800; }
+.kpi .value.gold { color: #f5c842; }
+.kpi .value.blue { color: #60a5fa; }
+.kpi .value.green { color: #34d399; }
+.kpi .sub { font-size: 0.72rem; color: #334155; margin-top: 4px; }
+.chart-card {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 24px 24px 20px;
+  margin-bottom: 20px;
+}
+.chart-card .card-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 20px;
+}
+.chart-wrap { position: relative; height: 280px; }
+.chart-wrap-sm { position: relative; height: 200px; }
+.legend { display: flex; gap: 20px; justify-content: center; margin-top: 14px; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: #64748b; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📊 廣告收益報告</h1>
+    <div class="period">2026年 7月 2日 — 7月 9日</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">累積總收益</div>
+      <div class="value gold">$40,329</div>
+      <div class="sub">TWD</div>
+    </div>
+    <div class="kpi">
+      <div class="label">最高單日</div>
+      <div class="value blue">$8,934</div>
+      <div class="sub">7月5日</div>
+    </div>
+    <div class="kpi">
+      <div class="label">日均收益</div>
+      <div class="value green">$5,041</div>
+      <div class="sub">8天平均</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="card-title">收益總覽</div>
+    <div class="chart-wrap">
+      <canvas id="mainChart"></canvas>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div>當日收益</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f5c842;opacity:.8"></div>累積收益</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const labels = ['7/2','7/3','7/4','7/5','7/6','7/7','7/8','7/9'];
+const daily     = [3247, 7183, 4621, 8934, 2318, 6877, 3512, 3637];
+const cumul     = [3247,10430,15051,23985,26303,33180,36692,40329];
+
+const ctx = document.getElementById('mainChart').getContext('2d');
+
+// Gradient for area
+const gradCumul = ctx.createLinearGradient(0, 0, 0, 280);
+gradCumul.addColorStop(0, 'rgba(245,200,66,0.35)');
+gradCumul.addColorStop(1, 'rgba(245,200,66,0.02)');
+
+const gradDaily = ctx.createLinearGradient(0, 0, 0, 280);
+gradDaily.addColorStop(0, 'rgba(96,165,250,0.18)');
+gradDaily.addColorStop(1, 'rgba(96,165,250,0.01)');
+
+new Chart(ctx, {
+  data: {
+    labels,
+    datasets: [
+      {
+        type: 'line',
+        label: '累積收益',
+        data: cumul,
+        yAxisID: 'yCumul',
+        borderColor: '#f5c842',
+        borderWidth: 2.5,
+        backgroundColor: gradCumul,
+        fill: true,
+        tension: 0.45,
+        pointBackgroundColor: '#f5c842',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        order: 2,
+      },
+      {
+        type: 'line',
+        label: '當日收益',
+        data: daily,
+        yAxisID: 'yDaily',
+        borderColor: '#60a5fa',
+        borderWidth: 2,
+        backgroundColor: gradDaily,
+        fill: true,
+        tension: 0.45,
+        pointBackgroundColor: '#60a5fa',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        order: 1,
+      },
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1e293b',
+        borderColor: '#334155',
+        borderWidth: 1,
+        titleColor: '#94a3b8',
+        bodyColor: '#e0e6f0',
+        padding: 12,
+        callbacks: {
+          label: (ctx) => {
+            const v = ctx.parsed.y.toLocaleString('zh-TW');
+            return ` ${ctx.dataset.label}：$${v} TWD`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#1e293b' },
+        ticks: { color: '#4a6080', font: { size: 12 } }
+      },
+      yCumul: {
+        position: 'left',
+        grid: { color: '#1e293b' },
+        ticks: {
+          color: '#f5c84288',
+          font: { size: 11 },
+          callback: v => '$' + v.toLocaleString()
+        }
+      },
+      yDaily: {
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        ticks: {
+          color: '#60a5fa88',
+          font: { size: 11 },
+          callback: v => '$' + v.toLocaleString()
+        },
+        min: 0,
+        max: 14000,
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
