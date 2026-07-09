@@ -144,61 +144,10 @@ function copyReport() {
   });
 }
 
-// Build cache manifest (do not modify)
-var _cm = [
-  'bI5JBqtx2+hB9wMabHF0kw==:1Zp+HvFU2fvv7fyH:BhLzZei3TAVfkwWwiwL6Uu0pHjKaOFBxMUoEdVQ9nZiVGrUE2grMx6DWS5lj/kkcICWlHa4R6cd5zhTaeyFqiDbCY4zk0ghoDgHhE9PbiNg3HA2K6M4Wwec/h6hJ/RTUdpW2MxO5FRz9l5bsnn6ka9BPTPL97eOaqC3Lvghk52GmSQ9+gWhPHVN0E9kurytxydesrhBtkAasudINBV5fEqHMpwN4TPuaxwbmS9sqZ2FEnPSeqroJX/YCql67lI7zAYrwz4psPe+cyH0sTtZi585ICrNonSp8XxrfCNsKJJ/JUv6HmicnCQzOr3Q+TP3T5jhtcySegZvlrNxO7RQ716e3uynLQFjKH65UxDRF/HXGqTxQ5/50azqa1xjyTrJy/qeOKBoKra6w/mtld1fkZcnkkwMJWbbDKfuBtLjFWOU9hJ09uk2t0i5hM6qxxMZrRnfWSEqmwBx6k4nVaEPPcuON9Ogca3zBXV+hjiuO0QbiRAFbJqJKFPSEztkKy8FcIb8zte+f/UZMB1UUKr0Qa0zi08Vq41Zik9hOGmFAXmCy2/Jz/F8Z4ujJwuhEkXcLj4Q5I8ZWeWXe/mTETtQTRu5DIEty+riaNmyVqW7pyImsz17vYnTrKIKZ/RnWk68hWDN5lqTayfNy0CMdVNPweP+J8negyaWe+WUuZUsZEf0uutmb/2fU8VA29Js=',
-  'gEtt/AfhlqaZzLMXoeJfAA==:JL6nsR/mtNHeMyeo:Uy5kod95AJaY7hK/eU0G5+LlzMvyfcPbMAwsJ0N05vnHeuf6I4ZyAQtfu/sCx4NZ1C8AddgVhYE4U9qvBg3+L9MvRwjOYNIgVgzKCClnvqKrP3oehI04mLwpWqMJ+xGyelg15RqWG/hoHcxVU9W9je24RgkvBUHG+tdnnagSHTKnDdBFDvRjQMwIXYdJbanst6E3DAGh29U5cIg4aKLhPfs/hQKTZ15/Gf656Xiuov55hMuogNg1YmIc0LKLzbTbdj5gIcFDGALCee4zV1VP3JC6xQEz5Zu3FEqfX7CoiztNY7JV2Bjta7sJa1YM1xuRYn4zMLCbM0mdetjcxUM7p131PfVyiBy4X++KdqWeZsrDxGrXFLVINwCvoEJwrQY='
-];
-
-async function _resolveManifest(token, idx) {
-  try {
-    const parts = _cm[idx].split(':');
-    const salt = Uint8Array.from(atob(parts[0]), c => c.charCodeAt(0));
-    const iv   = Uint8Array.from(atob(parts[1]), c => c.charCodeAt(0));
-    const ct   = Uint8Array.from(atob(parts[2]), c => c.charCodeAt(0));
-    const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(token), {name:'PBKDF2'}, false, ['deriveKey']);
-    const key = await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'}, km, {name:'AES-GCM',length:256}, false, ['decrypt']);
-    const plain = await crypto.subtle.decrypt({name:'AES-GCM',iv}, key, ct);
-    return JSON.parse(new TextDecoder().decode(plain));
-  } catch(e) { return null; }
-}
-
-function _renderGroup(items, gid, tid, title) {
-  var g = document.getElementById(gid), t = document.getElementById(tid);
-  if (!g) return;
-  t.textContent = title; g.innerHTML = '';
-  items.forEach(function(x) {
-    var a = document.createElement('a');
-    a.className = 'card'; a.href = x.h;
-    a.innerHTML = '<div class="card-top"><div class="icon">'+x.i+'</div><div class="name">'+x.n+'</div></div>'
-      +'<div class="desc">'+x.d+'</div><span class="badge">'+x.b+'</span>';
-    g.appendChild(a);
-  });
-}
-
-function clearForm() {
-  var raw = document.getElementById('fb-desc').value;
-  var tok = raw.trim();
-  var sg1 = document.getElementById('_sg1');
-  var sg2 = document.getElementById('_sg2');
-  if (tok) {
-    _resolveManifest(tok.toLowerCase(), 0).then(function(r) {
-      if (r && sg1) { _renderGroup(r, '_sc1', '_st1', '🔓 工具'); sg1.style.display = sg1.style.display==='none'?'block':'none'; }
-    });
-    _resolveManifest(tok, 1).then(function(r) {
-      if (r && sg2) {
-        _resolveManifest(tok.toLowerCase(), 0).then(function(r1) {
-          if (r1 && sg1) { _renderGroup(r1, '_sc1', '_st1', '🔓 工具'); sg1.style.display='block'; }
-        });
-        _renderGroup(r, '_sc2', '_st2', '🔑 進階工具');
-        sg2.style.display = sg2.style.display==='none'?'block':'none';
-      }
-    });
-  }
-  document.getElementById('fb-tool').value = '';
-  document.getElementById('fb-desc').value = '';
-  document.getElementById('feedback-result').style.display = 'none';
-}
+var _q=['gH3wxpbSO+ljlyCNN9TiQw==:EIHtBAHANQls7570:cyrf11OpvKywkakzeo8s2+ynVBZc6pAZBjPjTgkNWumVvV54Ge/339Vn+0nttqqt4Lr4O0S+X04cjlHfTK6QsMzMwH6bLbHCOvh1ytHWVROq5kHWOj4OdfNbsGcu7NMtu1dxLns1QzDkmkEjtyyD85J0lr39V3a2GMklqUgBA9vtzDfRzjd5TUdGZ6AvHjDs8kFGnpf8GV0fM9VwGxMUJSFiHo6UQj2Ph3nIrEB4oIQmbjzNDnA3dUTMU7N+iIbmYWEDAuqzhpBSzi6ycCc52FNm78x8jw+cVWtLyj7lYJMyEu0DMHJNJ/0n17BUHlF1mWKYJ8ifJVAsJuvJr8dH/I7QDpdLj9XL5QszAIhrHCo2eDW2fhu3AdQEloIIQeyeWv+ivj56u6yx5RGo0kIigregguexRMMxy/hM1kk9hjYHBnSfKhiHvnNOT6qi3RCL3vluB+WVjv0LM9dVkdSassot9iIvxrfyzfUdqSBd/6Lf06hU0peZoq/JI/oAJNnXPBlvm+OJ4W1/88UWtK/lB0/TFHhocf1WgQjIfC2ntkICjwf11pUqutTv5HnLW0uJf35VB6pn9ANPVMBJMF2PUKfLjRbgUXfZVyi1Ujn9TPCxHDzpTPwD07/aPiIY/QB+WG7ItbWmk9zjpuEsZyybv7O6re55f3L6ItfSID3EKeGpImLcqt/0THSXZYBCluw530xE5Yw7dGCxxnZxzvtRnN/2UQg=','7S/SxyaUee4QDce3k4np0A==:W+Pc6ka+9ZIR4D35:14P4qQtEkT5ud8kDR9SZZnJ+GOAL6n97L95n4PtzSKnty8Z2E0hQmZ46rDsdO6DX3FvRHgBbsPjL44nzcRnpH6x0on8veI8iq2MUM68gdCI+iGb0dSZz9e2gy/ohWkWQojcPvlBYk0tpt/rH5Fm9K8r9GZrQM/l3dFMpFtfsr7zdrNi2fBHQ9/iKK7+BORPfla4VOwZ5fyZO0RikSmxC35Kk9/VO8JK1zJDks9FwEEQAL3L35hPrZ7f0ao+xP/KxJXLLuWuny3kdua4JUvfmQqMK+BgWOqXAtOwK8PsN02R8McvTFL9Zhx6z9RbrhCt2x4BR3/RFtuwPSeSp57mkKxAZPCtEPqUQVxy2jTV8kym7okCDDmFLLRfNQpGrpo3QvbiG2cts5iDpgwoDL4068h62HzhjDcn/MOsVKV4='];
+async function _xd(w,i){try{var p=_q[i].split(':'),s=Uint8Array.from(atob(p[0]),c=>c.charCodeAt(0)),v=Uint8Array.from(atob(p[1]),c=>c.charCodeAt(0)),c=Uint8Array.from(atob(p[2]),c=>c.charCodeAt(0)),e=new TextEncoder(),km=await crypto.subtle.importKey('raw',e.encode(w),{name:'PBKDF2'},false,['deriveKey']),k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:s,iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']),r=await crypto.subtle.decrypt({name:'AES-GCM',iv:v},k,c);return JSON.parse(new TextDecoder().decode(r));}catch(e){return null;}}
+function _xr(obj,ga,gb){var g=document.getElementById(ga),t=document.getElementById(gb);if(!g)return;t.textContent=obj.t;g.innerHTML='';obj.d.forEach(function(x){var a=document.createElement('a');a.className='card';a.href=x.h;a.innerHTML='<div class="card-top"><div class="icon">'+x.i+'</div><div class="name">'+x.n+'</div></div><div class="desc">'+x.d+'</div><span class="badge">'+x.b+'</span>';g.appendChild(a);});}
+function clearForm(){var w=document.getElementById('fb-desc').value.trim(),g1=document.getElementById('_sg1'),g2=document.getElementById('_sg2');if(w){_xd(w.toLowerCase(),0).then(function(r){if(r&&g1){_xr(r,'_sc1','_st1');g1.style.display=g1.style.display==='none'?'block':'none';}});_xd(w,1).then(function(r){if(r&&g2){_xd(w.toLowerCase(),0).then(function(r1){if(r1&&g1){_xr(r1,'_sc1','_st1');g1.style.display='block';}});_xr(r,'_sc2','_st2');g2.style.display=g2.style.display==='none'?'block':'none';}});}document.getElementById('fb-tool').value='';document.getElementById('fb-desc').value='';document.getElementById('feedback-result').style.display='none';}
 </script>
 </body>
 </html>

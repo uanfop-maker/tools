@@ -216,7 +216,7 @@ details.history summary:hover { color: #c9a84c; }
   <div class="header">
     <div class="icon">📨</div>
     <h1>FB Messenger 私訊提醒</h1>
-    <span class="ver">v4.8.9</span>
+    <span class="ver">v4.9.0</span>
     <p class="subtitle">Chrome 插件 — 自動偵測 FB Business Suite 未讀私訊，<br>播放音效並發送 Telegram 通知</p>
   </div>
 
@@ -232,9 +232,9 @@ details.history summary:hover { color: #c9a84c; }
     </ul>
   </div>
 
-  <a class="download-btn" href="fb-messenger-alert-v4.8.9.zip" download>
-    ⬇ 下載最新版 v4.8.9
-    <span class="dl-sub">fb-messenger-alert-v4.8.9.zip · SW keepalive 防止休眠 + port 自動重連 + 修復音效與 TG 重複通知</span>
+  <a class="download-btn" href="fb-messenger-alert-v4.9.0.zip" download>
+    ⬇ 下載最新版 v4.9.0
+    <span class="dl-sub">fb-messenger-alert-v4.9.0.zip · 修復 AudioContext 無法從計時器啟動（用 singleton + 使用者手勢解鎖）</span>
   </a>
 
   <a class="download-stable" href="fb-messenger-alert-v4.8.8.zip" download>
@@ -245,6 +245,7 @@ details.history summary:hover { color: #c9a84c; }
   <details class="history">
     <summary>歷史版本（v1 ~ v4.8.8）</summary>
     <div class="history-list">
+      <div class="hv"><a href="fb-messenger-alert-v4.8.9.zip" download>⬇ v4.8.9</a> — SW keepalive alarm（每 24 秒）+ port 自動重連 + TG dedup 修復（移除 messageText diff）</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.8.zip" download>⬇ v4.8.8</a> ⭐ 穩定版 — 修復 SPA 跳頁後 content script 無限錯誤 loop（onValidPage 返回 return 而非 kill）</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.7.zip" download>⬇ v4.8.7</a> — 恢復原始音效（v4.6 Web Audio 振盪器 880→1100→880Hz）作為選項 1</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.6.zip" download>⬇ v4.8.6</a> — 修復 port.onDisconnect 誤殺 content script（SW 休眠斷線不再觸發 killScript）</div>
