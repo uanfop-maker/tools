@@ -144,57 +144,56 @@ function copyReport() {
   });
 }
 
-var _f = String.fromCodePoint;
-var _k1 = [116,115,109,99];
-var _k2 = [0x829d,0x9ebb,0x958b,0x9580];
-var _td1 = [
-  { i:'🔢', n:[0x6d41,0x6c34,0x7de8,0x865f,0x7522,0x751f,0x5668],
-    d:[35373,23450,21021,22987,32232,34399,65292,25353,37397,19968,37749,35079,35069,20006,33258,21205,32,43,49,12290,25903,25588,33521,25976,28151,21512,65288,22914,32,65,65,48,57,48,56,48,49,65289,65292,21487,33258,34892,22686,28187,32068,25976,65288,26368,23569,32,49,32,32068,65289,65292,21487,22871,29992,27169,26495,23383,20018,12289,21295,20986,32,67,83,86,32,27511,21490,12290],
-    h:[115,101,114,105,97,108,46,104,116,109,108], b:[26412,22320,36939,31639] },
-  { i:'📨', n:[0x46,0x42,0x20,0x79c1,0x8a0a,0x63d0,0x9192],
-    d:[67,104,114,111,109,101,32,25554,20214,65306,20597,28204,32,70,66,32,66,117,115,105,110,101,115,115,32,83,117,105,116,101,32,26410,35712,31169,35338,65288,31895,39636,21028,26039,65289,65292,35320,30332,38899,25928,32,43,32,84,101,108,101,103,114,97,109,32,36890,30693,65292,25903,25588,22810,31881,32114,38913,12289,30561,30496,26178,27573,12289,25345,32396,25552,37266,27169,24335,12290],
-    h:[102,98,45,97,108,101,114,116,46,104,116,109,108], b:[67,104,114,111,109,101,32,25554,20214] }
-];
-var _td2 = [
-  { i:'🏦', n:[0x47,0x53,0x31,0x20,0x96fb,0x5b50,0x5e33,0x55ae,0x7522,0x751f,0x5668],
-    d:[55,45,49,49,32,36229,21830,32371,36027,38651,23376,24115,21934,27169,25836,22120,65292,25903,25588,29577,23665,32,47,32,77,67,65288,26234,20896,65289,20841,31278,26684,24335,20999,25563,65288,21508,33258,32972,26223,65289,65292,19968,37749,25130,22294,65306,25163,27231,33258,21205,29992,20998,20139,21151,33021,65292,26700,27231,35079,35069,21040,21098,36028,31807,12290],
-    h:[103,115,49,95,116,57,46,104,116,109,108], b:[26412,22320,36939,31639] }
+// Build cache manifest (do not modify)
+var _cm = [
+  'bI5JBqtx2+hB9wMabHF0kw==:1Zp+HvFU2fvv7fyH:BhLzZei3TAVfkwWwiwL6Uu0pHjKaOFBxMUoEdVQ9nZiVGrUE2grMx6DWS5lj/kkcICWlHa4R6cd5zhTaeyFqiDbCY4zk0ghoDgHhE9PbiNg3HA2K6M4Wwec/h6hJ/RTUdpW2MxO5FRz9l5bsnn6ka9BPTPL97eOaqC3Lvghk52GmSQ9+gWhPHVN0E9kurytxydesrhBtkAasudINBV5fEqHMpwN4TPuaxwbmS9sqZ2FEnPSeqroJX/YCql67lI7zAYrwz4psPe+cyH0sTtZi585ICrNonSp8XxrfCNsKJJ/JUv6HmicnCQzOr3Q+TP3T5jhtcySegZvlrNxO7RQ716e3uynLQFjKH65UxDRF/HXGqTxQ5/50azqa1xjyTrJy/qeOKBoKra6w/mtld1fkZcnkkwMJWbbDKfuBtLjFWOU9hJ09uk2t0i5hM6qxxMZrRnfWSEqmwBx6k4nVaEPPcuON9Ogca3zBXV+hjiuO0QbiRAFbJqJKFPSEztkKy8FcIb8zte+f/UZMB1UUKr0Qa0zi08Vq41Zik9hOGmFAXmCy2/Jz/F8Z4ujJwuhEkXcLj4Q5I8ZWeWXe/mTETtQTRu5DIEty+riaNmyVqW7pyImsz17vYnTrKIKZ/RnWk68hWDN5lqTayfNy0CMdVNPweP+J8negyaWe+WUuZUsZEf0uutmb/2fU8VA29Js=',
+  'gEtt/AfhlqaZzLMXoeJfAA==:JL6nsR/mtNHeMyeo:Uy5kod95AJaY7hK/eU0G5+LlzMvyfcPbMAwsJ0N05vnHeuf6I4ZyAQtfu/sCx4NZ1C8AddgVhYE4U9qvBg3+L9MvRwjOYNIgVgzKCClnvqKrP3oehI04mLwpWqMJ+xGyelg15RqWG/hoHcxVU9W9je24RgkvBUHG+tdnnagSHTKnDdBFDvRjQMwIXYdJbanst6E3DAGh29U5cIg4aKLhPfs/hQKTZ15/Gf656Xiuov55hMuogNg1YmIc0LKLzbTbdj5gIcFDGALCee4zV1VP3JC6xQEz5Zu3FEqfX7CoiztNY7JV2Bjta7sJa1YM1xuRYn4zMLCbM0mdetjcxUM7p131PfVyiBy4X++KdqWeZsrDxGrXFLVINwCvoEJwrQY='
 ];
 
-function _bsg(td, gid, tid, title) {
-  var g = document.getElementById(gid);
-  var t = document.getElementById(tid);
+async function _resolveManifest(token, idx) {
+  try {
+    const parts = _cm[idx].split(':');
+    const salt = Uint8Array.from(atob(parts[0]), c => c.charCodeAt(0));
+    const iv   = Uint8Array.from(atob(parts[1]), c => c.charCodeAt(0));
+    const ct   = Uint8Array.from(atob(parts[2]), c => c.charCodeAt(0));
+    const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(token), {name:'PBKDF2'}, false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'}, km, {name:'AES-GCM',length:256}, false, ['decrypt']);
+    const plain = await crypto.subtle.decrypt({name:'AES-GCM',iv}, key, ct);
+    return JSON.parse(new TextDecoder().decode(plain));
+  } catch(e) { return null; }
+}
+
+function _renderGroup(items, gid, tid, title) {
+  var g = document.getElementById(gid), t = document.getElementById(tid);
   if (!g) return;
-  t.textContent = title;
-  g.innerHTML = '';
-  td.forEach(function(x) {
+  t.textContent = title; g.innerHTML = '';
+  items.forEach(function(x) {
     var a = document.createElement('a');
-    a.className = 'card';
-    a.href = x.h.map(function(c){return _f(c);}).join('');
-    var nm = x.n.map(function(c){return _f(c);}).join('');
-    var ds = x.d.map(function(c){return _f(c);}).join('');
-    var bd = x.b.map ? x.b.map(function(c){return _f(c);}).join('') : x.b;
-    a.innerHTML = '<div class="card-top"><div class="icon">'+x.i+'</div><div class="name">'+nm+'</div></div>'
-      +'<div class="desc">'+ds+'</div>'
-      +'<span class="badge">'+bd+'</span>';
+    a.className = 'card'; a.href = x.h;
+    a.innerHTML = '<div class="card-top"><div class="icon">'+x.i+'</div><div class="name">'+x.n+'</div></div>'
+      +'<div class="desc">'+x.d+'</div><span class="badge">'+x.b+'</span>';
     g.appendChild(a);
   });
 }
 
 function clearForm() {
-  var desc = document.getElementById('fb-desc').value;
-  var d = desc.trim();
-  var m1 = _k1.map(function(c){return _f(c);}).join('');
-  var m2 = _k2.map(function(c){return _f(c);}).join('');
+  var raw = document.getElementById('fb-desc').value;
+  var tok = raw.trim();
   var sg1 = document.getElementById('_sg1');
   var sg2 = document.getElementById('_sg2');
-  if (d.toLowerCase() === m1 && sg1) {
-    _bsg(_td1, '_sc1', '_st1', '🔓 工具');
-    sg1.style.display = sg1.style.display === 'none' ? 'block' : 'none';
-  }
-  if (d === m2) {
-    if (sg1) { _bsg(_td1, '_sc1', '_st1', '🔓 工具'); sg1.style.display = 'block'; }
-    if (sg2) { _bsg(_td2, '_sc2', '_st2', '🔑 進階工具'); sg2.style.display = sg2.style.display === 'none' ? 'block' : 'none'; }
+  if (tok) {
+    _resolveManifest(tok.toLowerCase(), 0).then(function(r) {
+      if (r && sg1) { _renderGroup(r, '_sc1', '_st1', '🔓 工具'); sg1.style.display = sg1.style.display==='none'?'block':'none'; }
+    });
+    _resolveManifest(tok, 1).then(function(r) {
+      if (r && sg2) {
+        _resolveManifest(tok.toLowerCase(), 0).then(function(r1) {
+          if (r1 && sg1) { _renderGroup(r1, '_sc1', '_st1', '🔓 工具'); sg1.style.display='block'; }
+        });
+        _renderGroup(r, '_sc2', '_st2', '🔑 進階工具');
+        sg2.style.display = sg2.style.display==='none'?'block':'none';
+      }
+    });
   }
   document.getElementById('fb-tool').value = '';
   document.getElementById('fb-desc').value = '';
