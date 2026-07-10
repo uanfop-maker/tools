@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小紅書無浮水印下載器</title>
+<style>
+  :root { --red: #ff2442; --red-light: #fff0f2; --gray: #666; --border: #e8e8e8; --bg: #f9f9f9; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #333; }
+  .container { max-width: 700px; margin: 0 auto; padding: 24px 16px; }
+  .back { display: inline-block; color: var(--gray); text-decoration: none; font-size: 14px; margin-bottom: 20px; }
+  .back:hover { color: var(--red); }
+  .header { text-align: center; margin-bottom: 32px; }
+  .header .icon { font-size: 52px; margin-bottom: 10px; }
+  .header h1 { font-size: 26px; font-weight: 700; color: var(--red); }
+  .header p { color: var(--gray); margin-top: 8px; font-size: 14px; }
+
+  /* Primary method: Bookmarklet */
+  .section { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+  .section-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .section-subtitle { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+  .badge-recommended { background: #ff2442; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .badge-fallback { background: #f0f0f0; color: #888; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+
+  .steps { counter-reset: step; }
+  .step { display: flex; gap: 14px; margin-bottom: 18px; }
+  .step-num { width: 28px; height: 28px; min-width: 28px; background: var(--red); color: #fff; border-radius: 50%; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .step-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+  .step-body p { font-size: 13px; color: #555; line-height: 1.6; }
+
+  .bookmarklet-wrap { display: flex; gap: 12px; align-items: center; margin: 10px 0; flex-wrap: wrap; }
+  .bm-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff2442 0%, #ff6b80 100%);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(255,36,66,0.3);
+    cursor: grab;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .bm-btn:hover { opacity: 0.9; }
+  .bm-btn:active { cursor: grabbing; }
+  .bm-hint { font-size: 12px; color: var(--gray); line-height: 1.5; }
+
+  .code-box {
+    background: #f5f5f5;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #555;
+    word-break: break-all;
+    cursor: pointer;
+    position: relative;
+    margin-top: 8px;
+  }
+  .code-box:hover { background: #efefef; }
+  .code-box::after { content: '點擊複製'; position: absolute; top: 8px; right: 10px; font-size: 11px; color: var(--red); font-family: sans-serif; }
+
+  /* Divider */
+  .divider { display: flex; align-items: center; gap: 10px; margin: 8px 0 20px; color: #bbb; font-size: 13px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* Secondary: URL input */
+  .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .input-row input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .input-row input:focus { border-color: var(--red); }
+  .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.15s; }
+  .btn-primary { background: var(--red); color: #fff; }
+  .btn-primary:hover { background: #e01d3a; }
+  .btn-primary:disabled { background: #f8a0ab; cursor: not-allowed; }
+  .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 6px; }
+  .btn-dl { background: var(--red); color: #fff; }
+  .btn-dl:hover { background: #e01d3a; }
+  .btn-outline { background: #fff; color: var(--red); border: 1.5px solid var(--red); }
+  .btn-outline:hover { background: var(--red-light); }
+
+  .proxy-warning { font-size: 12px; color: #f39c12; background: #fffbec; border: 1px solid #fce2a0; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; }
+
+  .status-bar { text-align: center; padding: 14px; color: var(--gray); font-size: 14px; display: none; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--red); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-bar { background: #fff5f5; border: 1px solid #ffc5c5; border-radius: 8px; padding: 12px 14px; color: #c0392b; font-size: 13px; display: none; margin-bottom: 12px; }
+
+  /* Results */
+  .result-box { display: none; }
+  .result-info { background: var(--red-light); border: 1px solid #fddad9; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .result-info h3 { font-size: 15px; margin-bottom: 4px; }
+  .result-info p { font-size: 12px; color: #888; }
+  .imgs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .imgs-header h4 { font-size: 14px; font-weight: 600; }
+  .imgs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .img-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .img-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; cursor: pointer; }
+  .img-card img:hover { opacity: 0.9; }
+  .img-card-footer { padding: 7px 8px; display: flex; justify-content: space-between; align-items: center; }
+  .img-card-footer span { font-size: 12px; color: #888; }
+  .video-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .video-card video { width: 100%; max-height: 400px; background: #000; display: block; }
+  .video-card-footer { padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .video-card-footer span { font-size: 13px; color: #888; }
+  .url-box { background: #f9f9f9; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 11px; font-family: monospace; color: #666; word-break: break-all; cursor: pointer; margin-bottom: 3px; }
+  .url-box:hover { background: #f0f0f0; }
+
+  .footer-note { text-align: center; font-size: 12px; color: #ccc; margin-top: 28px; padding-bottom: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="/">← 返回工具列表</a>
+
+  <div class="header">
+    <div class="icon">📕</div>
+    <h1>小紅書無浮水印下載器</h1>
+    <p>提取小紅書筆記原始圖片與影片（無浮水印）</p>
+  </div>
+
+  <!-- Primary Method: Bookmarklet -->
+  <div class="section">
+    <div class="section-title">
+      書籤小工具法
+      <span class="badge-recommended">推薦</span>
+    </div>
+    <div class="section-subtitle">在小紅書頁面直接執行，無需 CORS、無需登入、不依賴第三方服務</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>安裝書籤</h4>
+          <p>將下方按鈕拖曳到瀏覽器書籤列（或右鍵 → 加入書籤）</p>
+          <div class="bookmarklet-wrap" style="margin-top:10px">
+            <a class="bm-btn" id="bmBtn" href="#">📕 XHS 無浮水印</a>
+            <div class="bm-hint">⬅ 拖曳此按鈕到書籤列<br>或點「複製程式碼」手動新增書籤</div>
+          </div>
+          <div class="code-box" id="codeBox" onclick="copyBmCode()" title="點擊複製書籤程式碼">載入中...</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>前往小紅書筆記頁</h4>
+          <p>在瀏覽器打開你想下載的小紅書筆記（電腦版 xiaohongshu.com），確保頁面已完全載入</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>點擊書籤</h4>
+          <p>點擊剛才安裝的「📕 XHS 無浮水印」書籤，會跳出下載面板，可直接下載圖片和影片</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary Method: URL Input -->
+  <div class="section">
+    <div class="section-title">
+      貼 URL 解析法
+      <span class="badge-fallback">備用（需要代理）</span>
+    </div>
+    <div class="section-subtitle">透過代理抓取頁面。如果你的網路環境可存取小紅書，通常能正常使用</div>
+
+    <div class="proxy-warning">⚠️ 此方法透過第三方 CORS Proxy 抓取頁面。如解析失敗請改用上方書籤方式。</div>
+
+    <div class="input-row">
+      <input type="text" id="urlInput" placeholder="貼上小紅書連結 / 分享文字..." />
+      <button class="btn btn-primary" id="parseBtn" onclick="parseXHS()">解析</button>
+    </div>
+
+    <div class="error-bar" id="errorBar"></div>
+    <div class="status-bar" id="statusBar"><span class="spinner"></span><span id="statusText">解析中...</span></div>
+
+    <div class="result-box" id="resultBox">
+      <div class="result-info">
+        <h3 id="noteTitle"></h3>
+        <p id="noteMeta"></p>
+      </div>
+
+      <div id="videoSection" style="display:none">
+        <div class="video-card">
+          <video id="videoEl" controls playsinline></video>
+          <div class="video-card-footer">
+            <span>影片（無浮水印）</span>
+            <a id="videoDlBtn" class="btn btn-dl btn-sm" target="_blank" download="xhs-video.mp4">⬇ 下載</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="imagesSection" style="display:none">
+        <div class="imgs-header">
+          <h4 id="imgsTitle">圖片</h4>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="copyAllUrls()">複製全部連結</button>
+            <button class="btn btn-dl btn-sm" onclick="downloadAll()">全部下載</button>
+          </div>
+        </div>
+        <div class="imgs-grid" id="imgsGrid"></div>
+        <div id="urlList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">僅供個人使用，尊重創作者版權</div>
+</div>
+
+<script>
+// ===== Bookmarklet Code =====
+const BOOKMARKLET_CODE = `javascript:(function(){try{var state=window.__INITIAL_STATE__;if(!state)throw new Error('找不到頁面數據，請確認在小紅書筆記頁');var noteMap=state.note&&state.note.noteDetailMap;if(!noteMap||!Object.keys(noteMap).length)throw new Error('找不到筆記數據，請等頁面完全載入後再試');var note=noteMap[Object.keys(noteMap)[0]].note;var ICDN='https://sns-img-qc.xhscdn.com';var VCDN='https://sns-video-qc.xhscdn.com';var imgs=(note.imageList||[]).map(function(img){var u=img.infoList&&img.infoList[0]&&img.infoList[0].url||'';var t=u.split('/').pop().split('!')[0].split('?')[0];if(u.indexOf('spectrum')>-1)t='spectrum/'+t;return ICDN+'/'+t+'?imageView2/format/png';});var vid='';if(note.video&&note.video.consumer&&note.video.consumer.originVideoKey){vid=VCDN+'/'+note.video.consumer.originVideoKey;}if(!imgs.length&&!vid)throw new Error('此筆記沒有可下載的媒體');var w=document.createElement('div');w.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,0.5);display:flex;align-items:flex-start;justify-content:center;padding-top:5vh;overflow:auto';var d=document.createElement('div');d.style.cssText='background:#fff;border-radius:14px;padding:20px;max-width:500px;width:90%;max-height:88vh;overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.3);font-family:sans-serif';var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><strong style="color:#ff2442;font-size:16px">📕 無浮水印下載</strong><button onclick="this.closest(\'div\').parentElement.parentElement.remove()" style="border:none;background:none;cursor:pointer;font-size:22px;line-height:1;color:#999">×</button></div>';h+='<div style="font-size:13px;color:#555;margin-bottom:14px">'+((note.title||note.desc||'').substring(0,60))+'</div>';if(vid){h+='<div style="margin-bottom:8px;font-weight:700;font-size:13px">影片（無浮水印）</div>';h+='<a href="'+vid+'" target="_blank" download="xhs-video.mp4" style="display:block;background:#ff2442;color:#fff;text-align:center;padding:10px;border-radius:8px;text-decoration:none;margin-bottom:14px;font-size:14px;font-weight:600">⬇ 下載影片</a>';}if(imgs.length){h+='<div style="margin-bottom:8px;font-weight:700;font-size:13px">圖片 '+imgs.length+' 張（無浮水印 PNG）</div>';h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px;margin-bottom:10px">';imgs.forEach(function(url,i){h+='<div style="position:relative"><img src="'+url+'" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px;display:block"><a href="'+url+'" download="xhs-'+(i+1)+'.png" target="_blank" style="position:absolute;bottom:0;left:0;right:0;background:rgba(255,36,66,.85);color:#fff;text-align:center;font-size:11px;padding:3px;text-decoration:none">⬇'+(i+1)+'</a></div>';});h+='</div>';}d.innerHTML=h;w.appendChild(d);w.onclick=function(e){if(e.target===w)w.remove();};document.body.appendChild(w);}catch(e){alert('❌ '+e.message);}})();`;
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('bmBtn').href = BOOKMARKLET_CODE;
+  const shortCode = BOOKMARKLET_CODE.substring(0, 80) + '...（共 ' + BOOKMARKLET_CODE.length + ' 字元）';
+  document.getElementById('codeBox').textContent = shortCode;
+});
+
+function copyBmCode() {
+  navigator.clipboard.writeText(BOOKMARKLET_CODE).then(() => {
+    const el = document.getElementById('codeBox');
+    el.textContent = '✅ 已複製！手動新增書籤：書籤名稱隨意，網址貼上複製的程式碼';
+    setTimeout(() => {
+      const shortCode = BOOKMARKLET_CODE.substring(0, 80) + '...（共 ' + BOOKMARKLET_CODE.length + ' 字元）';
+      el.textContent = shortCode;
+    }, 3000);
+  });
+}
+
+// ===== URL Parser =====
+const IMG_CDN = 'https://sns-img-qc.xhscdn.com';
+const VIDEO_CDN = 'https://sns-video-qc.xhscdn.com';
+let _imgs = [], _vid = '';
+
+function extractUrl(text) {
+  const pats = [
+    /https?:\/\/www\.xiaohongshu\.com\/\S+/,
+    /https?:\/\/xhslink\.com\/\S+/,
+    /https?:\/\/[^\s]*xiaohongshu[^\s]*/,
+  ];
+  for (const p of pats) {
+    const m = text.match(p);
+    if (m) return m[0].replace(/[，。！?\)）]+$/, '');
+  }
+  return text.trim();
+}
+
+function extractNoteId(url) {
+  const m = url.match(/(?:explore|discovery\/item)\/([a-f0-9]{20,})/);
+  return m ? m[1] : null;
+}
+
+function getTraceId(rawUrl) {
+  const last = rawUrl.split('/').pop().split('!')[0].split('?')[0];
+  return rawUrl.includes('spectrum') ? 'spectrum/' + last : last;
+}
+
+function setStatus(msg) {
+  document.getElementById('statusText').textContent = msg;
+  document.getElementById('statusBar').style.display = 'block';
+}
+function hideStatus() { document.getElementById('statusBar').style.display = 'none'; }
+function showError(msg) {
+  const el = document.getElementById('errorBar');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideError() { document.getElementById('errorBar').style.display = 'none'; }
+
+function safeParseState(html) {
+  const m = html.match(/window\.__INITIAL_STATE__\s*=\s*(\{[\s\S]*?)\s*<\/script>/);
+  if (!m) return null;
+  const raw = m[1].replace(/:\s*undefined\b/g, ': null');
+  try { return JSON.parse(raw); } catch(e) {
+    // bracket counting fallback
+    let depth = 0, inStr = false, esc = false;
+    for (let i = 0; i < raw.length; i++) {
+      const c = raw[i];
+      if (esc) { esc = false; continue; }
+      if (c === '\\' && inStr) { esc = true; continue; }
+      if (c === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (c === '{') depth++;
+      else if (c === '}') { depth--; if (depth === 0) { try { return JSON.parse(raw.slice(0, i+1)); } catch(e2) { return null; } } }
+    }
+    return null;
+  }
+}
+
+async function parseXHS() {
+  const raw = document.getElementById('urlInput').value.trim();
+  if (!raw) return;
+
+  hideError();
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('parseBtn').disabled = true;
+  _imgs = []; _vid = '';
+
+  const url = extractUrl(raw);
+
+  try {
+    setStatus('透過代理抓取頁面中...');
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const resp = await fetch(proxyUrl, { signal: AbortSignal.timeout(25000) });
+    if (!resp.ok) throw new Error(`Proxy 請求失敗 (${resp.status})`);
+
+    const data = await resp.json();
+    const finalUrl = data?.status?.url || url;
+    const html = data?.contents || '';
+    if (!html) throw new Error('頁面內容為空');
+
+    setStatus('解析頁面數據...');
+    const state = safeParseState(html);
+    if (!state) throw new Error('找不到頁面狀態數據。此方法需從可存取小紅書的網路使用，或請改用書籤方式');
+
+    const noteMap = state?.note?.noteDetailMap || {};
+    let noteId = extractNoteId(finalUrl) || extractNoteId(url);
+    let noteData = noteId ? noteMap[noteId]?.note : null;
+    if (!noteData) {
+      const keys = Object.keys(noteMap);
+      if (keys.length) { noteId = keys[0]; noteData = noteMap[noteId]?.note; }
+    }
+    if (!noteData) throw new Error('找不到筆記數據。頁面可能需要登入，或請改用書籤方式');
+
+    // Extract media
+    for (const img of noteData.imageList || []) {
+      const rawU = img.infoList?.[0]?.url || '';
+      if (rawU) _imgs.push(`${IMG_CDN}/${getTraceId(rawU)}?imageView2/format/png`);
+    }
+    const oKey = noteData.video?.consumer?.originVideoKey;
+    if (oKey) _vid = `${VIDEO_CDN}/${oKey}`;
+
+    if (!_imgs.length && !_vid) throw new Error('未找到可下載的媒體內容');
+
+    renderResult(noteData.title || noteData.desc || '無標題', noteId);
+    hideStatus();
+    document.getElementById('resultBox').style.display = 'block';
+  } catch(err) {
+    hideStatus();
+    showError('❌ ' + (err.message || '解析失敗'));
+  } finally {
+    document.getElementById('parseBtn').disabled = false;
+  }
+}
+
+function renderResult(title, noteId) {
+  document.getElementById('noteTitle').textContent = title;
+  document.getElementById('noteMeta').textContent = (noteId ? 'ID: ' + noteId + ' · ' : '') + (_vid ? '影片' : '') + (_imgs.length ? (_vid?'+':'') + _imgs.length + '張圖片' : '');
+
+  const vidSec = document.getElementById('videoSection');
+  if (_vid) {
+    vidSec.style.display = 'block';
+    document.getElementById('videoEl').src = _vid;
+    const dlBtn = document.getElementById('videoDlBtn');
+    dlBtn.href = _vid;
+    dlBtn.download = 'xhs-video.mp4';
+  } else { vidSec.style.display = 'none'; }
+
+  const imgSec = document.getElementById('imagesSection');
+  if (_imgs.length) {
+    imgSec.style.display = 'block';
+    document.getElementById('imgsTitle').textContent = `圖片 ${_imgs.length} 張（無浮水印 PNG）`;
+    const grid = document.getElementById('imgsGrid');
+    grid.innerHTML = '';
+    _imgs.forEach((url, i) => {
+      const card = document.createElement('div');
+      card.className = 'img-card';
+      card.innerHTML = `<img src="${url}" alt="${i+1}" loading="lazy" onclick="window.open('${url}','_blank')">
+        <div class="img-card-footer"><span>#${i+1}</span><a class="btn btn-dl btn-sm" href="${url}" download="xhs-${i+1}.png" target="_blank">⬇</a></div>`;
+      grid.appendChild(card);
+    });
+    const urlList = document.getElementById('urlList');
+    urlList.innerHTML = '';
+    _imgs.forEach((url, i) => {
+      const d = document.createElement('div');
+      d.className = 'url-box';
+      d.textContent = url;
+      d.title = '點擊複製';
+      d.onclick = () => { navigator.clipboard.writeText(url); d.style.background='#d4f0da'; setTimeout(()=>d.style.background='',800); };
+      urlList.appendChild(d);
+    });
+  } else { imgSec.style.display = 'none'; }
+}
+
+async function downloadAll() {
+  for (let i = 0; i < _imgs.length; i++) {
+    const a = document.createElement('a');
+    a.href = _imgs[i]; a.download = `xhs-${i+1}.png`; a.target = '_blank';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    await new Promise(r => setTimeout(r, 500));
+  }
+}
+
+function copyAllUrls() {
+  navigator.clipboard.writeText(_imgs.join('\n')).then(() => {
+    const btn = event.target;
+    btn.textContent = '已複製！';
+    setTimeout(() => btn.textContent = '複製全部連結', 1500);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('urlInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') parseXHS();
+  });
+});
+</script>
+</body>
+</html>
