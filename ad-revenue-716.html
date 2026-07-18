@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>廣告收益報告 7/15</title>
+<title>廣告收益報告 7/15–7/18</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -58,24 +58,24 @@ body {
 <div class="container">
   <div class="header">
     <h1>📊 廣告收益報告</h1>
-    <div class="period">2026年 7月 15日</div>
+    <div class="period">2026年 7月 15日 — 7月 18日</div>
   </div>
 
   <div class="kpi-row">
     <div class="kpi">
-      <div class="label">當日總收益</div>
-      <div class="value gold">$217</div>
+      <div class="label">累積總收益</div>
+      <div class="value gold">$1,043</div>
       <div class="sub">TWD</div>
     </div>
     <div class="kpi">
-      <div class="label">尖峰時段</div>
-      <div class="value blue">$21</div>
-      <div class="sub">18:00</div>
+      <div class="label">最高單日</div>
+      <div class="value blue">$341</div>
+      <div class="sub">7月17日</div>
     </div>
     <div class="kpi">
-      <div class="label">小時均收益</div>
-      <div class="value green">$9</div>
-      <div class="sub">24小時平均</div>
+      <div class="label">日均收益</div>
+      <div class="value green">$261</div>
+      <div class="sub">4天平均</div>
     </div>
   </div>
 
@@ -85,16 +85,16 @@ body {
       <canvas id="mainChart"></canvas>
     </div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div>當時段收益</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div>當日收益</div>
       <div class="legend-item"><div class="legend-dot" style="background:#f5c842;opacity:.8"></div>累積收益</div>
     </div>
   </div>
 </div>
 
 <script>
-const labels = ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'];
-const daily     = [1, 0, 0, 0, 0, 1, 7, 9, 17, 15, 14, 15, 12, 13, 16, 13, 10, 15, 21, 11, 14, 8, 3, 2];
-const cumul     = [1, 1, 1, 1, 1, 2, 9, 18, 35, 50, 64, 79, 91, 104, 120, 133, 143, 158, 179, 190, 204, 212, 215, 217];
+const labels = ['7/15','7/16','7/17','7/18'];
+const daily     = [217, 298, 341, 187];
+const cumul     = [217, 515, 856, 1043];
 
 const ctx = document.getElementById('mainChart').getContext('2d');
 
@@ -127,7 +127,7 @@ new Chart(ctx, {
       },
       {
         type: 'line',
-        label: '當時段收益',
+        label: '當日收益',
         data: daily,
         yAxisID: 'yDaily',
         borderColor: '#60a5fa',
@@ -186,7 +186,7 @@ new Chart(ctx, {
           callback: v => '$' + v.toLocaleString()
         },
         min: 0,
-        max: 40,
+        max: 400,
       }
     }
   }
