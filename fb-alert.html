@@ -216,7 +216,7 @@ details.history summary:hover { color: #c9a84c; }
   <div class="header">
     <div class="icon">📨</div>
     <h1>FB Messenger 私訊提醒</h1>
-    <span class="ver">v4.10.0</span>
+    <span class="ver">v4.12.0</span>
     <p class="subtitle">Chrome 插件 — 自動偵測 FB Business Suite 未讀私訊，<br>播放音效並發送 Telegram 通知</p>
   </div>
 
@@ -229,12 +229,13 @@ details.history summary:hover { color: #c9a84c; }
       <li><span class="fi">🔔</span>音效模式：關閉 / 單次 / 持續（可設定間隔秒數）；支援自訂音效上傳</li>
       <li><span class="fi">🌙</span>睡眠時段：設定靜音時間段，期間只發 TG、不播音效</li>
       <li><span class="fi">🏪</span>多粉絲頁支援：自動識別粉絲頁名稱，不依賴 URL</li>
+      <li><span class="fi">🏷️</span>粉專分類群組：動態表格 UI 設定名稱/ID/群組對應，通知的粉絲頁名稱後面自動附加 (群組)</li>
     </ul>
   </div>
 
-  <a class="download-btn" href="fb-messenger-alert-v4.10.0.zip" download>
-    ⬇ 下載最新版 v4.10.0
-    <span class="dl-sub">fb-messenger-alert-v4.10.0.zip · H1 SPA換粉絲頁軟重啟狀態 / H2 AudioContext停用時系統通知 / M1 多分頁未讀獨立追蹤 / M2 offscreen去重時間桶 / M3 dataUtime=0退路偵測</span>
+  <a class="download-btn" href="fb-messenger-alert-v4.12.0.zip" download>
+    ⬇ 下載最新版 v4.12.0
+    <span class="dl-sub">fb-messenger-alert-v4.12.0.zip · 粉專分類群組改為動態表格 UI（自動長列＋逐列刪除），移除通知標題冗字，支援依 ID/名稱比對群組標籤</span>
   </a>
 
   <a class="download-stable" href="fb-messenger-alert-v4.8.8.zip" download>
@@ -243,8 +244,11 @@ details.history summary:hover { color: #c9a84c; }
   </a>
 
   <details class="history">
-    <summary>歷史版本（v1 ~ v4.9.0）</summary>
+    <summary>歷史版本（v1 ~ v4.11.0）</summary>
     <div class="history-list">
+      <div class="hv"><a href="fb-messenger-alert-v4.11.0.zip" download>⬇ v4.11.0</a> — 新增粉專分類群組功能（可貼表格：名稱,ID,群組），先比對 ID 再比對名稱，通知附加 (群組) 標籤</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.10.1.zip" download>⬇ v4.10.1</a> — 移除 TG 通知開頭的「📨 FB 私訊通知」冗字</div>
+      <div class="hv"><a href="fb-messenger-alert-v4.10.0.zip" download>⬇ v4.10.0</a> — H1 SPA換粉絲頁軟重啟狀態 / H2 AudioContext停用時系統通知 / M1 多分頁未讀獨立追蹤 / M2 offscreen去重時間桶 / M3 dataUtime=0退路偵測</div>
       <div class="hv"><a href="fb-messenger-alert-v4.9.0.zip" download>⬇ v4.9.0</a> — 修復 AudioContext 無法從計時器啟動（用 singleton + 使用者手勢解鎖）</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.9.zip" download>⬇ v4.8.9</a> — SW keepalive alarm（每 24 秒）+ port 自動重連 + TG dedup 修復（移除 messageText diff）</div>
       <div class="hv"><a href="fb-messenger-alert-v4.8.8.zip" download>⬇ v4.8.8</a> ⭐ 穩定版 — 修復 SPA 跳頁後 content script 無限錯誤 loop（onValidPage 返回 return 而非 kill）</div>
