@@ -417,25 +417,32 @@
             });
         });
 
-        document.getElementById('copy-btn').addEventListener('click', async function() {
+        document.getElementById('copy-btn').addEventListener('click', function() {
             const btn = this;
             const originalText = btn.innerHTML;
             const originalBgColor = btn.style.backgroundColor;
+            const succeed = (msg) => {
+                btn.innerHTML = msg;
+                btn.style.backgroundColor = 'orange';
+                setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = originalBgColor; }, 3000);
+            };
 
-            try {
-                const canvas = await html2canvas(document.getElementById('invoice'), { 
-                    scale: 3, 
-                    useCORS: true, 
-                    backgroundColor: '#ffffff' 
-                });
+            // 產生截圖是 Promise，先不 await——html2canvas 在 scale:3 時渲染要花時間，
+            // 若在呼叫 clipboard.write() 前先 await 完渲染，瀏覽器常常會判定「使用者手勢
+            // 已經過期」而直接擋下剪貼簿寫入（不會丟明顯錯誤，只是靜默失敗改走最後手段），
+            // 這就是原本「按一次沒反應、按第二次才成功」的根因（第二次通常因為瀏覽器/字型
+            // 快取讓渲染變快，剛好卡在時效內）。ClipboardItem 支援直接吃 Promise<Blob>，
+            // 讓 write() 這個呼叫本身留在點擊當下的同一輪，即可避開這個問題。
+            const blobPromise = html2canvas(document.getElementById('invoice'), {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+            }).then(canvas => new Promise(resolve => canvas.toBlob(resolve, 'image/png')));
 
-                canvas.toBlob(async function(blob) {
-                    const succeed = (msg) => {
-                        btn.innerHTML = msg;
-                        btn.style.backgroundColor = 'orange';
-                        setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = originalBgColor; }, 3000);
-                    };
-                    // 手機：優先用 Web Share API 分享圖片
+            async function fallbackShareOrSave() {
+                try {
+                    const blob = await blobPromise;
+                    // 手機：Web Share API 分享圖片（需要 blob 已經 resolve，無法比照剪貼簿用 Promise 延後）
                     if (navigator.share && navigator.canShare) {
                         const file = new File([blob], 'invoice.png', { type: 'image/png' });
                         if (navigator.canShare({ files: [file] })) {
@@ -446,24 +453,32 @@
                             } catch (e) { if (e.name === 'AbortError') return; }
                         }
                     }
-                    // 桌面：剪貼簿 API
-                    try {
-                        const item = new ClipboardItem({ "image/png": blob });
-                        await navigator.clipboard.write([item]);
-                        succeed('✅ 已複製截圖！');
-                    } catch (error) {
-                        // 最後手段：開新分頁讓使用者長按儲存
-                        const url = URL.createObjectURL(blob);
-                        window.open(url, '_blank');
-                        succeed('✅ 請長按圖片另存');
-                        setTimeout(() => URL.revokeObjectURL(url), 5000);
-                    }
-                }, 'image/png');
-
-            } catch (error) {
-                console.error('截圖失敗:', error);
-                alert('❌ 發生錯誤，無法截圖。');
+                    // 最後手段：開新分頁讓使用者長按儲存
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                    succeed('✅ 請長按圖片另存');
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                } catch (error) {
+                    console.error('截圖失敗:', error);
+                    alert('❌ 發生錯誤，無法截圖。');
+                }
             }
+
+            if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+                try {
+                    const item = new ClipboardItem({ 'image/png': blobPromise });
+                    navigator.clipboard.write([item]).then(() => {
+                        succeed('✅ 已複製截圖！');
+                    }).catch((error) => {
+                        console.error('剪貼簿複製失敗，改用分享/另存:', error);
+                        fallbackShareOrSave();
+                    });
+                    return;
+                } catch (error) {
+                    console.error('ClipboardItem 建立失敗:', error);
+                }
+            }
+            fallbackShareOrSave();
         });
         document.getElementById('copy-amount-btn').addEventListener('click', async function() {
             const btn = this;
