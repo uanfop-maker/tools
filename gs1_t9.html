@@ -176,6 +176,14 @@
         </label>
         <span class="sw-label" id="sw-mc" onclick="switchTool('mc')">🎮 MC（智冠）</span>
     </div>
+    <div id="tool-switcher">
+        <span class="sw-label" id="sw-famima" onclick="switchStore('famima')">🏪 全家</span>
+        <label class="sw-toggle">
+            <input type="checkbox" id="store-check" checked>
+            <span class="sw-track"></span>
+        </label>
+        <span class="sw-label active" id="sw-seven" onclick="switchStore('seven')">🏬 7-11</span>
+    </div>
     <div class="invoice-container" id="invoice">
         <div class="title" id="title">7-ELEVEN統一超商繳費電子帳單</div>
         <div class="date" id="invoice-date">訂單日期：2025/9/3</div>
@@ -223,9 +231,11 @@
 
     <div id="editor">
         <h3>編輯發票內容</h3>
-        <label>選擇商店：</label><br>
-        <input type="radio" name="store" value="famima" id="store-famima"> 全家<br>
-        <input type="radio" name="store" value="seven" id="store-seven" checked> 7-11<br>
+        <label>選擇商店：（已改用上方切換開關，這裡僅保留隱藏欄位供程式讀取）</label><br>
+        <span style="display:none">
+            <input type="radio" name="store" value="famima" id="store-famima"> 全家
+            <input type="radio" name="store" value="seven" id="store-seven" checked> 7-11
+        </span>
         <label for="edit-invoice-date">訂單日期：</label>
         <input type="text" id="edit-invoice-date" value="2025/9/3">
         <label for="edit-product-name-1">商品名稱：</label>
@@ -312,7 +322,54 @@
 3. 此付款系統由「${window._provider || "玉山商業銀行股份有限公司 "}」提供。`;
             
             updateExtraText();
+            updateImageCountForAmount();
         }
+
+        // 7-11 條碼是固定面額(10000/5000/2000/1000)組成，依總金額算出「最少張數」的組合，
+        // 自動帶入圖片數量預設值（全家沒有這個限制，維持原本數量不變）。
+        // 用 DP 而非貪心，確保任何金額都能求出真正最少張數（貪心在這組面額下剛好也是最優解，
+        // 但用 DP 比較保險，未來面額若改成非典型組合也不會算錯）。
+        function computeMinImageCount(amount) {
+            const denomUnits = [10, 5, 2, 1]; // 單位：千元
+            const targetUnits = Math.max(1, Math.ceil(amount / 1000));
+            const dp = new Array(targetUnits + 1).fill(Infinity);
+            dp[0] = 0;
+            for (let u = 1; u <= targetUnits; u++) {
+                for (const d of denomUnits) {
+                    if (d <= u && dp[u - d] + 1 < dp[u]) dp[u] = dp[u - d] + 1;
+                }
+            }
+            return Number.isFinite(dp[targetUnits]) ? dp[targetUnits] : 1;
+        }
+
+        function updateImageCountForAmount() {
+            const storeType = document.querySelector('input[name="store"]:checked').value;
+            const countInput = document.getElementById('edit-image-count');
+            let count = parseInt(countInput.value) || 1;
+            if (storeType === 'seven') {
+                const rawAmount = (document.getElementById('edit-amount-1').value || '').replace(/[^\d.]/g, '');
+                const amount = parseFloat(rawAmount) || 0;
+                if (amount > 0) {
+                    count = computeMinImageCount(amount);
+                    countInput.value = count;
+                }
+            }
+            generateBarcodeInputs(count);
+        }
+
+        function switchStore(which) {
+            const isSeven = (which === 'seven');
+            document.getElementById('store-check').checked = isSeven;
+            document.getElementById('sw-famima').classList.toggle('active', !isSeven);
+            document.getElementById('sw-seven').classList.toggle('active', isSeven);
+            document.getElementById('store-famima').checked = !isSeven;
+            document.getElementById('store-seven').checked = isSeven;
+            applyQuickInputs();
+        }
+
+        document.getElementById('store-check').addEventListener('change', function() {
+            switchStore(this.checked ? 'seven' : 'famima');
+        });
 
         document.getElementById('quick-amount').addEventListener('input', applyQuickInputs);
         document.getElementById('quick-time').addEventListener('input', applyQuickInputs);
@@ -334,8 +391,6 @@
             document.getElementById('edit-detail-1').value = 'Dropshipping';
 
             applyQuickInputs();
-            document.getElementById('edit-image-count').value = 1;
-            generateBarcodeInputs(1);
         });
 
         document.querySelectorAll('input[name="store"]').forEach(radio => {
