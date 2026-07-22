@@ -41,6 +41,32 @@ body {
   transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .color-palette-btn:hover { background: #c9a84c18; color: #c9a84c; border-color: #c9a84c77; }
+.group-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  background: #0b1220;
+  padding: 8px 0 16px;
+  margin-bottom: 8px;
+}
+.group-nav-btn {
+  background: #111c30;
+  border: 1px solid #c9a84c33;
+  border-radius: 8px;
+  color: #c9a84c99;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  min-width: 32px;
+  padding: 5px 8px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.group-nav-btn:hover { background: #c9a84c18; color: #c9a84c; border-color: #c9a84c77; }
+.group-nav-btn.active { background: linear-gradient(135deg, #a87828, #d4af37); color: #0b1220; border-color: transparent; }
 .groups {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -487,6 +513,7 @@ textarea {
   ⚜ 流水編號產生器
   <button class="color-palette-btn" title="自訂組背景顏色" onclick="openColorPicker()">🎨</button>
 </div>
+<div class="group-nav" id="groupNav"></div>
 <div class="groups" id="groups"></div>
 <div class="add-row">
   <button class="add-btn" onclick="addGroup()">＋ 新增組</button>
@@ -789,6 +816,46 @@ function refreshGroupNumbers() {
     const btn = document.getElementById(`rbtn-${id}`);
     if (btn) btn.style.visibility = canRemove ? 'visible' : 'hidden';
   });
+  renderGroupNav();
+}
+
+// ── 浮動導覽列：跳到指定組別 + scroll-spy 標示目前在哪一組 ──────────────
+let groupScrollObserver = null;
+
+function scrollToGroup(id) {
+  const el = document.getElementById(`g${id}`);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setupGroupScrollSpy() {
+  if (groupScrollObserver) groupScrollObserver.disconnect();
+  groupScrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const id = entry.target.id.slice(1); // "g123" -> "123"
+      const btn = document.getElementById(`navbtn-${id}`);
+      if (btn) btn.classList.toggle('active', entry.isIntersecting);
+    });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+  groupIds.forEach(id => {
+    const el = document.getElementById(`g${id}`);
+    if (el) groupScrollObserver.observe(el);
+  });
+}
+
+function renderGroupNav() {
+  const nav = document.getElementById('groupNav');
+  if (!nav) return;
+  nav.innerHTML = '';
+  groupIds.forEach((id, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'group-nav-btn';
+    btn.id = `navbtn-${id}`;
+    btn.textContent = String(idx + 1);
+    btn.title = `跳到組 ${idx + 1}`;
+    btn.onclick = () => scrollToGroup(id);
+    nav.appendChild(btn);
+  });
+  setupGroupScrollSpy();
 }
 
 function buildGroup(id) {
