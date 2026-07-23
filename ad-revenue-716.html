@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>廣告收益報告 7/15–7/18</title>
+<title>廣告收益報告 7/15–7/23</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -58,24 +58,24 @@ body {
 <div class="container">
   <div class="header">
     <h1>📊 廣告收益報告</h1>
-    <div class="period">2026年 7月 15日 — 7月 18日</div>
+    <div class="period">2026年 7月 15日 — 7月 23日</div>
   </div>
 
   <div class="kpi-row">
     <div class="kpi">
       <div class="label">累積總收益</div>
-      <div class="value gold">$1,043</div>
+      <div class="value gold">$3,067</div>
       <div class="sub">TWD</div>
     </div>
     <div class="kpi">
       <div class="label">最高單日</div>
-      <div class="value blue">$341</div>
-      <div class="sub">7月17日</div>
+      <div class="value blue">$589</div>
+      <div class="sub">7月22日</div>
     </div>
     <div class="kpi">
       <div class="label">日均收益</div>
-      <div class="value green">$261</div>
-      <div class="sub">4天平均</div>
+      <div class="value green">$341</div>
+      <div class="sub">9天平均</div>
     </div>
   </div>
 
@@ -92,9 +92,9 @@ body {
 </div>
 
 <script>
-const labels = ['7/15','7/16','7/17','7/18'];
-const daily     = [217, 298, 341, 187];
-const cumul     = [217, 515, 856, 1043];
+const labels = ['7/15','7/16','7/17','7/18','7/19','7/20','7/21','7/22','7/23'];
+const daily     = [217, 298, 341, 187, 298, 412, 356, 589, 369];
+const cumul     = [217, 515, 856, 1043, 1341, 1753, 2109, 2698, 3067];
 
 const ctx = document.getElementById('mainChart').getContext('2d');
 
@@ -186,7 +186,7 @@ new Chart(ctx, {
           callback: v => '$' + v.toLocaleString()
         },
         min: 0,
-        max: 400,
+        max: 700,
       }
     }
   }
